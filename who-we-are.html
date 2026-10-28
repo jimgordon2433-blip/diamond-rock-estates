@@ -188,6 +188,9 @@
   .partner-figure.mono{display:flex;align-items:center;justify-content:center;background:var(--green);}
   .partner-figure.mono .glyph{font-family:var(--serif);font-style:italic;color:var(--gold);font-size:clamp(3rem,6vw,4.5rem);letter-spacing:.04em;}
   .partner-figure.mono .glyph small{display:block;font-style:normal;font-family:var(--sans);font-size:.7rem;letter-spacing:.34em;text-transform:uppercase;color:var(--stone);margin-top:.8rem;text-align:center;}
+  .partner.family{grid-template-columns:1fr;gap:2.2rem;}
+  .partner.family .partner-figure{aspect-ratio:16/9;max-width:100%;}
+  .family-cap{position:absolute;left:1.4rem;bottom:1.1rem;font-family:var(--serif);font-style:italic;font-size:1.1rem;color:var(--cream);text-shadow:0 1px 12px rgba(0,0,0,.65);}
   .partner-body .role{font-family:var(--sans);font-weight:500;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:1rem;}
   .partner-body h3{font-size:clamp(1.8rem,3vw,2.4rem);margin-bottom:.4rem;}
   .partner-body .firm{font-family:var(--serif);font-style:italic;color:var(--green);font-size:1.05rem;margin-bottom:1.4rem;}
@@ -374,9 +377,10 @@
     </article>
 
     <!-- Kasteel -->
-    <article class="partner reveal">
-      <figure class="partner-figure mono">
-        <span class="glyph" aria-hidden="true">K44<small>Kasteel Enterprises</small></span>
+    <article class="partner family reveal">
+      <figure class="partner-figure">
+        <img src="media/kasteel-family.jpg" alt="The family behind Kasteel Enterprises on a mountain deck" loading="lazy" />
+        <figcaption class="family-cap">The family behind Kasteel</figcaption>
       </figure>
       <div class="partner-body">
         <span class="role">Home Builder · Custom Construction</span>
