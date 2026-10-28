@@ -290,5 +290,26 @@ function endDrag(){dragging=false;scroll.classList.remove('panning');}
 scroll.addEventListener('pointerup',endDrag);scroll.addEventListener('pointercancel',endDrag);
 scroll.addEventListener('wheel',e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();zoom=Math.min(MAX,Math.max(MIN,+(zoom-(e.deltaY>0?0.3:-0.3)).toFixed(2)));applyZoom(true);},{passive:false});
 </script>
+<audio id="bgm" loop preload="none"><source src="media/amb-forest.mp3" type="audio/mpeg"></audio>
+<button id="sndBtn" class="snd-toggle" aria-label="Play ambient birdsong" title="Ambient birdsong">
+  <svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+  <svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 5.5a9 9 0 0 1 0 13"/></svg>
+</button>
+<style>
+.snd-toggle{position:fixed;right:18px;top:74px;z-index:12;width:42px;height:42px;border-radius:50%;border:1px solid rgba(58,56,47,.2);background:#fff;color:#b8923a;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .3s,background .3s,color .3s;box-shadow:0 1px 8px rgba(0,0,0,.12);}
+.snd-toggle:hover{border-color:#c9a84c;}
+.snd-toggle.playing{background:#c9a84c;color:#1a1a16;border-color:#c9a84c;}
+.snd-toggle svg{width:19px;height:19px;}
+</style>
+<script>
+(function(){var a=document.getElementById('bgm'),b=document.getElementById('sndBtn');if(!a||!b)return;a.volume=0.5;
+var on=true;try{on=localStorage.getItem('dre-sound')!=='off';}catch(e){}
+function icon(){b.classList.toggle('playing',on);b.querySelector('.snd-on').style.display=on?'block':'none';b.querySelector('.snd-off').style.display=on?'none':'block';b.setAttribute('aria-label',on?'Mute ambient birdsong':'Play ambient birdsong');}
+function play(){var p=a.play();if(p&&p.catch)p.catch(function(){});}
+var EV=['pointerdown','keydown','touchstart','wheel'];
+b.addEventListener('click',function(){on=!on;try{localStorage.setItem('dre-sound',on?'on':'off');}catch(e){}if(on)play();else a.pause();icon();});
+if(on){play();var r=function(){if(on)play();EV.forEach(function(ev){document.removeEventListener(ev,r);});};EV.forEach(function(ev){document.addEventListener(ev,r,{once:true,passive:true});});}
+icon();})();
+</script>
 </body>
 </html>

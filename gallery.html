@@ -182,11 +182,11 @@ lb.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Ma
 </style>
 <script>
 (function(){var a=document.getElementById('bgm'),b=document.getElementById('sndBtn');if(!a||!b)return;a.volume=0.55;
-var on=false;try{on=localStorage.getItem('dre-sound')==='on';}catch(e){}
+var on=true;try{on=localStorage.getItem('dre-sound')!=='off';}catch(e){}
 function icon(){b.classList.toggle('playing',on);b.querySelector('.snd-on').style.display=on?'block':'none';b.querySelector('.snd-off').style.display=on?'none':'block';b.setAttribute('aria-label',on?'Mute ambient sound':'Play ambient sound');}
 function play(){var p=a.play();if(p&&p.catch)p.catch(function(){});}
 b.addEventListener('click',function(){on=!on;try{localStorage.setItem('dre-sound',on?'on':'off');}catch(e){}if(on)play();else a.pause();icon();});
-if(on){play();var r=function(){if(on)play();document.removeEventListener('pointerdown',r);};document.addEventListener('pointerdown',r,{once:true});}
+var EV=['pointerdown','keydown','touchstart','wheel'];if(on){play();var r=function(){if(on)play();EV.forEach(function(ev){document.removeEventListener(ev,r);});};EV.forEach(function(ev){document.addEventListener(ev,r,{once:true,passive:true});});}
 icon();})();
 </script>
 </body>
