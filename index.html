@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Diamond Rock Estates — Where the Blue Ridge Finds You</title>
+<link rel="icon" type="image/png" href="media/favicon.png" />
+<link rel="apple-touch-icon" href="media/favicon.png" />
 <meta name="description" content="Private mountain land in Ellijay, Georgia. A limited collection of forested homesites in the North Georgia mountains, ninety minutes from Atlanta." />
 
 <!-- Google Fonts: Playfair Display + Inter -->
@@ -575,6 +577,9 @@
     .nav-links a:nth-child(1),
     .nav-links a:nth-child(2){display:none;}
   }
+
+  .nav-badge{height:36px;width:36px;border-radius:50%;display:block;flex:none;}
+  .footer-badge{width:100px;height:100px;border-radius:50%;display:block;margin:0 auto;}
 </style>
 </head>
 <body>
@@ -582,12 +587,7 @@
 <!-- ============ NAV ============ -->
 <nav class="nav" id="nav">
   <a href="#hero" class="nav-logo" aria-label="Diamond Rock Estates home">
-    <span class="diamond" aria-hidden="true">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round">
-        <path d="M5 9 L12 3 L19 9 L12 21 Z"/>
-        <path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/>
-      </svg>
-    </span>
+    <img src="media/logo.png" class="nav-badge" alt="" />
     <span class="wordmark">Diamond Rock Estates</span>
   </a>
   <div class="nav-links">
@@ -668,7 +668,7 @@
     <div class="features">
       <div class="feature reveal">
         <span class="num">01</span>
-        <h3>2–10 Acre Homesites</h3>
+        <h3>3–4.8 Acre Homesites</h3>
         <p>Room to breathe, to build, to leave the trees standing.</p>
       </div>
       <div class="feature reveal d1">
@@ -818,14 +818,7 @@
 
 <!-- ============ FOOTER ============ -->
 <footer>
-  <div class="footer-mark">
-    <span class="diamond" aria-hidden="true">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round">
-        <path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/>
-      </svg>
-    </span>
-    <span class="wordmark">Diamond Rock Estates</span>
-  </div>
+  <div class="footer-mark"><img src="media/logo.png" class="footer-badge" alt="Diamond Rock Estates" /></div>
   <div class="footer-divider"></div>
   <nav class="footer-nav">
     <a href="#land">Land</a>

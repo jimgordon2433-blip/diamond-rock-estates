@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Diamond Rock Estates — Lot Map</title>
+<link rel="icon" type="image/png" href="media/favicon.png" />
+<link rel="apple-touch-icon" href="media/favicon.png" />
 <meta name="description" content="Interactive lot map for Diamond Rock Estates — explore each homesite, its acreage, features, and current availability." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -131,6 +133,9 @@
     .topright{gap:.4rem;}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+
+  .nav-badge{height:36px;width:36px;border-radius:50%;display:block;flex:none;}
+  .footer-badge{width:100px;height:100px;border-radius:50%;display:block;margin:0 auto;}
 </style>
 </head>
 <body>
@@ -147,7 +152,7 @@
   </div>
 
   <div class="ctl title">
-    <span class="diamond" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8923a" stroke-width="1" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/></svg></span>
+    <img src="media/logo.png" class="nav-badge" alt="" />
     <span class="wm">Diamond Rock Estates</span>
     <span class="tg">The Lots</span>
   </div>

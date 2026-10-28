@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Gallery — Diamond Rock Estates</title>
+<link rel="icon" type="image/png" href="media/favicon.png" />
+<link rel="apple-touch-icon" href="media/favicon.png" />
 <meta name="description" content="A gallery of Diamond Rock Estates — ridgeline vistas, the land, the entrance, and homesites in the North Georgia mountains." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -73,12 +75,15 @@
   .copyright{font-size:.7rem;letter-spacing:.16em;color:var(--stone);opacity:.6;}
   @media (max-width:680px){.nav-links{gap:1rem;}.nav-links a{font-size:.6rem;letter-spacing:.13em;}.nav-logo .wordmark{font-size:.62rem;letter-spacing:.2em;}.nav-links a.navhide{display:none;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+
+  .nav-badge{height:36px;width:36px;border-radius:50%;display:block;flex:none;}
+  .footer-badge{width:100px;height:100px;border-radius:50%;display:block;margin:0 auto;}
 </style>
 </head>
 <body>
 <nav class="nav">
   <a href="index.html" class="nav-logo" aria-label="Diamond Rock Estates home">
-    <span class="diamond" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/></svg></span>
+    <img src="media/logo.png" class="nav-badge" alt="" />
     <span class="wordmark">Diamond Rock Estates</span>
   </a>
   <div class="nav-links">
@@ -117,7 +122,7 @@
 </div>
 
 <footer>
-  <div class="footer-mark"><span class="diamond" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/></svg></span><span class="wordmark">Diamond Rock Estates</span></div>
+  <div class="footer-mark"><img src="media/logo.png" class="footer-badge" alt="Diamond Rock Estates" /></div>
   <div class="footer-divider"></div>
   <nav class="footer-nav"><a href="index.html#land">Land</a><a href="index.html#location">Location</a><a href="lots.html">The Lots</a><a href="gallery.html">Gallery</a><a href="who-we-are.html">Who We Are</a><a href="index.html#inquire">Inquire</a></nav>
   <p class="copyright">&copy; 2025 Diamond Rock Estates. All rights reserved.</p>
