@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Lots — Diamond Rock Estates</title>
+<meta name="description" content="Available homesites at Diamond Rock Estates — acreage, setting, and pricing for all forty-eight mountain lots in Ellijay, Georgia." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{--black:#0f0e0b;--green:#2d3d2e;--stone:#b8a98a;--gold:#c9a84c;--cream:#f5f0e8;--cream-dim:#e7dfd0;
+    --serif:'Playfair Display',Georgia,serif;--sans:'Inter',-apple-system,sans-serif;--maxw:1180px;--pad:clamp(1.5rem,5vw,6rem);--ease:cubic-bezier(.22,1,.36,1);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--sans);font-weight:300;background:var(--black);color:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  ::selection{background:var(--gold);color:var(--black);}
+  a{color:inherit;text-decoration:none;}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.1;letter-spacing:-.01em;}
+  .eyebrow{font-weight:400;font-size:.72rem;letter-spacing:.42em;text-transform:uppercase;display:inline-flex;align-items:center;gap:1rem;color:var(--gold);}
+  .eyebrow::before{content:"";width:34px;height:1px;background:currentColor;opacity:.6;}
+  .diamond svg{display:block;}
+
+  .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.05rem var(--pad);background:rgba(15,14,11,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,.18);}
+  .nav-logo{display:flex;align-items:center;gap:.7rem;color:var(--cream);}
+  .nav-logo .wordmark{font-weight:400;font-size:.78rem;letter-spacing:.34em;text-transform:uppercase;white-space:nowrap;}
+  .nav-links{display:flex;align-items:center;gap:2.2rem;}
+  .nav-links a{color:var(--cream);font-size:.74rem;letter-spacing:.24em;text-transform:uppercase;font-weight:400;position:relative;padding:.3rem 0;opacity:.82;transition:opacity .4s var(--ease);}
+  .nav-links a.active{opacity:1;color:var(--gold);}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease);}
+  .nav-links a:hover{opacity:1;}.nav-links a:hover::after{transform:scaleX(1);transform-origin:left;}
+
+  .lhead{max-width:var(--maxw);margin:0 auto;padding:8.5rem var(--pad) 1rem;}
+  .lhead h1{font-size:clamp(2.4rem,5vw,3.8rem);font-weight:500;margin:1.1rem 0 .7rem;}
+  .lhead .sub{color:var(--stone);max-width:56ch;font-size:1.02rem;}
+  .stats{display:flex;flex-wrap:wrap;gap:2.6rem;max-width:var(--maxw);margin:0 auto;padding:1.4rem var(--pad) 0;}
+  .stat .v{font-family:var(--serif);font-size:1.7rem;color:var(--cream);}
+  .stat .k{font-size:.62rem;letter-spacing:.26em;text-transform:uppercase;color:var(--stone);margin-top:.2rem;}
+
+  .controls{max-width:var(--maxw);margin:0 auto;padding:2rem var(--pad) 1rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;}
+  .controls .lbl{font-size:.62rem;letter-spacing:.26em;text-transform:uppercase;color:var(--stone);margin-right:.3rem;}
+  .chip{background:transparent;border:1px solid rgba(245,240,232,.2);color:var(--cream);padding:.5rem 1rem;border-radius:2px;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .3s var(--ease);opacity:.82;}
+  .chip:hover{border-color:var(--gold);opacity:1;}
+  .chip.on{background:var(--gold);border-color:var(--gold);color:var(--black);opacity:1;}
+  .csearch{margin-left:auto;display:flex;align-items:center;gap:.5rem;background:rgba(245,240,232,.06);border:1px solid rgba(245,240,232,.18);border-radius:3px;padding:.5rem .7rem;}
+  .csearch input{border:none;background:transparent;outline:none;color:var(--cream);font-family:var(--sans);font-size:.85rem;width:120px;}
+  .csearch input::placeholder{color:var(--stone);}
+
+  .tablewrap{max-width:var(--maxw);margin:0 auto;padding:.5rem var(--pad) 5rem;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{text-align:left;font-family:var(--sans);font-weight:500;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--stone);padding:1rem .9rem;border-bottom:1px solid rgba(201,168,76,.3);cursor:pointer;white-space:nowrap;user-select:none;}
+  thead th .ar{opacity:0;margin-left:.4rem;color:var(--gold);}
+  thead th.sorted .ar{opacity:1;}
+  thead th.num,tbody td.num{text-align:right;}
+  tbody td{padding:1.05rem .9rem;border-bottom:1px solid rgba(245,240,232,.08);font-size:.96rem;color:var(--cream-dim);vertical-align:middle;}
+  tbody tr{transition:background .25s var(--ease);}
+  tbody tr:hover{background:rgba(201,168,76,.06);}
+  .lotno{font-family:var(--serif);font-size:1.35rem;color:var(--cream);}
+  .feat{color:var(--cream);}
+  .street{color:var(--stone);font-size:.85rem;letter-spacing:.02em;}
+  .price{font-family:var(--serif);font-size:1.2rem;color:var(--gold);white-space:nowrap;}
+  .acres{font-variant-numeric:tabular-nums;color:var(--cream);}
+  .inq{display:inline-block;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.4);padding:.45rem .8rem;border-radius:2px;transition:all .3s var(--ease);white-space:nowrap;}
+  .inq:hover{background:var(--gold);color:var(--black);}
+  tr.hide{display:none;}
+  .note{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad) 4rem;color:var(--stone);font-size:.78rem;opacity:.75;}
+
+  /* mobile cards */
+  @media (max-width:720px){
+    thead{display:none;}
+    table,tbody,tr,td{display:block;width:100%;}
+    tbody tr{border:1px solid rgba(201,168,76,.18);border-radius:4px;margin-bottom:1rem;padding:.6rem .4rem;}
+    tbody td{border:none;padding:.4rem .9rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+    tbody td.num{text-align:right;}
+    tbody td::before{content:attr(data-label);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone);}
+    td.cell-lot::before{content:"";}
+    .lotno{font-size:1.5rem;}
+    td.cell-inq{justify-content:flex-end;}
+    .nav-links{gap:1rem;}.nav-links a{font-size:.6rem;letter-spacing:.13em;}.nav-links a.navhide{display:none;}
+    .nav-logo .wordmark{font-size:.62rem;letter-spacing:.2em;}
+    .csearch{margin-left:0;}
+  }
+  footer{background:#0a0908;color:var(--cream);padding:clamp(3rem,7vh,4.5rem) var(--pad) 2.4rem;text-align:center;border-top:1px solid rgba(201,168,76,.12);}
+  .footer-mark{display:inline-flex;flex-direction:column;align-items:center;gap:1rem;margin-bottom:2rem;}
+  .footer-mark .wordmark{font-weight:400;font-size:.82rem;letter-spacing:.4em;text-transform:uppercase;}
+  .footer-divider{width:60px;height:1px;background:var(--gold);margin:0 auto 2rem;}
+  .footer-nav{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:2rem;}
+  .footer-nav a{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--stone);transition:color .4s var(--ease);}
+  .footer-nav a:hover{color:var(--gold);}
+  .copyright{font-size:.7rem;letter-spacing:.16em;color:var(--stone);opacity:.6;}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html" class="nav-logo" aria-label="Diamond Rock Estates home">
+    <span class="diamond" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/></svg></span>
+    <span class="wordmark">Diamond Rock Estates</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#land" class="navhide">Land</a>
+    <a href="index.html#location" class="navhide">Location</a>
+    <a href="lots.html" class="active">The Lots</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="who-we-are.html" class="navhide">Who We Are</a>
+    <a href="index.html#inquire">Inquire</a>
+  </div>
+</nav>
+
+<header class="lhead">
+  <span class="eyebrow">Availability &amp; Pricing</span>
+  <h1>The Lots</h1>
+  <p class="sub">Forty-eight homesites across the mountain, each with its own character — from the entrance lots at the base to the premium sites on the ridge. Select a lot to inquire.</p>
+</header>
+<div class="stats">
+  <div class="stat"><div class="v">48</div><div class="k">Homesites</div></div>
+  <div class="stat"><div class="v">3.05&ndash;4.83</div><div class="k">Acres</div></div>
+  <div class="stat"><div class="v">From $141,750</div><div class="k">Priced</div></div>
+  <div class="stat"><div class="v">3</div><div class="k">Mountain Roads</div></div>
+</div>
+
+<div class="controls">
+  <span class="lbl">Road</span>
+  <button class="chip on" data-street="all">All</button>
+  <button class="chip" data-street="Pheasant Tail Trace">Pheasant Tail Trace</button>
+  <button class="chip" data-street="Wild Turkey Road">Wild Turkey Road</button>
+  <button class="chip" data-street="Stone Fly Close">Stone Fly Close</button>
+  <div class="csearch"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b8a98a" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="search" type="text" inputmode="numeric" placeholder="Lot #" aria-label="Find lot by number"></div>
+</div>
+
+<div class="tablewrap">
+  <table id="tbl">
+    <thead><tr>
+      <th data-sort="n" class="num sorted">Lot <span class="ar">&uarr;</span></th>
+      <th data-sort="feat">Setting <span class="ar">&uarr;</span></th>
+      <th data-sort="street">Road <span class="ar">&uarr;</span></th>
+      <th data-sort="acres" class="num">Acres <span class="ar">&uarr;</span></th>
+      <th data-sort="price" class="num">Price <span class="ar">&uarr;</span></th>
+      <th></th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<p class="note">Pricing reflects current list prices and is subject to change. All lots served by underground electric and paved roads; individual wells and septic. Contact us to confirm availability and schedule a walk of any homesite.</p>
+
+<footer>
+  <div class="footer-mark"><span class="diamond" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/></svg></span><span class="wordmark">Diamond Rock Estates</span></div>
+  <div class="footer-divider"></div>
+  <nav class="footer-nav"><a href="index.html#land">Land</a><a href="index.html#location">Location</a><a href="lots.html">The Lots</a><a href="gallery.html">Gallery</a><a href="who-we-are.html">Who We Are</a><a href="index.html#inquire">Inquire</a></nav>
+  <p class="copyright">&copy; 2025 Diamond Rock Estates. All rights reserved.</p>
+</footer>
+
+<script>
+const LOTS = [{"n":1,"street":"Pheasant Tail Trace","feat":"Entrance Lots (At Base)","acres":3.27,"price":245250,"grade":"A"},{"n":2,"street":"Pheasant Tail Trace","feat":"Entrance Lots (At Base)","acres":3.08,"price":229000,"grade":"B"},{"n":3,"street":"Pheasant Tail Trace","feat":"Entrance Lots (At Base)","acres":3.59,"price":269250,"grade":"A"},{"n":4,"street":"Wild Turkey Road","feat":"Entrance Lots (At Base)","acres":3.33,"price":183150,"grade":"C"},{"n":5,"street":"Wild Turkey Road","feat":"Entrance Lots (At Base)","acres":4.06,"price":263900,"grade":"B"},{"n":6,"street":"Wild Turkey Road","feat":"Entrance Lots (At Base)","acres":3.75,"price":243750,"grade":"B"},{"n":7,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.3,"price":181500,"grade":"C"},{"n":8,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.12,"price":171600,"grade":"C"},{"n":9,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.76,"price":244400,"grade":"B"},{"n":10,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.26,"price":211900,"grade":"B"},{"n":11,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.11,"price":171050,"grade":"C"},{"n":12,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.21,"price":144450,"grade":"D"},{"n":13,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.35,"price":150750,"grade":"D"},{"n":14,"street":"Wild Turkey Road","feat":"First Cul-de-sac","acres":3.37,"price":151650,"grade":"D"},{"n":15,"street":"Wild Turkey Road","feat":"Mountain Base (Opposite side of stream)","acres":3.21,"price":144450,"grade":"D"},{"n":16,"street":"Wild Turkey Road","feat":"Mountain Base (Opposite side of stream)","acres":3.29,"price":148050,"grade":"D"},{"n":17,"street":"Pheasant Tail Trace","feat":"Mountain Base (Opposite side of stream)","acres":3.48,"price":156600,"grade":"D"},{"n":18,"street":"Pheasant Tail Trace","feat":"Rock Formation Lot","acres":3.17,"price":237750,"grade":"A"},{"n":19,"street":"Pheasant Tail Trace","feat":"Steep","acres":3.42,"price":222300,"grade":"B"},{"n":20,"street":"Pheasant Tail Trace","feat":"Stone Fly Close","acres":3.22,"price":241500,"grade":"A"},{"n":21,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.96,"price":257400,"grade":"B"},{"n":22,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.8,"price":247000,"grade":"B"},{"n":23,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":4.83,"price":313950,"grade":"B"},{"n":24,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.07,"price":230250,"grade":"A"},{"n":25,"street":"Stone Fly Close","feat":"Mountain Top","acres":3.34,"price":299000,"grade":"Premium"},{"n":26,"street":"Stone Fly Close","feat":"Mountain Top","acres":3.71,"price":329900,"grade":"Premium"},{"n":27,"street":"Stone Fly Close","feat":"Mountain Top","acres":3.69,"price":329000,"grade":"Premium"},{"n":28,"street":"Stone Fly Close","feat":"Mountain Top","acres":3.92,"price":349900,"grade":"Premium"},{"n":29,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.21,"price":176550,"grade":"C"},{"n":30,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.93,"price":255450,"grade":"B"},{"n":31,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.6,"price":198000,"grade":"C"},{"n":32,"street":"Stone Fly Close","feat":"360 Mountain Views","acres":3.85,"price":346500,"grade":"Premium"},{"n":33,"street":"Stone Fly Close","feat":"360 Mountain Views","acres":4.03,"price":362700,"grade":"Premium"},{"n":34,"street":"Stone Fly Close","feat":"Stone Fly Close","acres":3.25,"price":178750,"grade":"C"},{"n":35,"street":"Stone Fly Close","feat":"Third Cul-de-sac","acres":3.67,"price":238550,"grade":"B"},{"n":36,"street":"Stone Fly Close","feat":"Third Cul-de-sac","acres":3.55,"price":266250,"grade":"A"},{"n":37,"street":"Stone Fly Close","feat":"Third Cul-de-sac","acres":4.41,"price":286650,"grade":"B"},{"n":38,"street":"Stone Fly Close","feat":"Third Cul-de-sac","acres":4.48,"price":336000,"grade":"A"},{"n":39,"street":"Pheasant Tail Trace","feat":"Third Cul-de-sac","acres":3.35,"price":184250,"grade":"C"},{"n":40,"street":"Pheasant Tail Trace","feat":"Pheasant Tail Trace - Ridgeline Views","acres":3.05,"price":167750,"grade":"C"},{"n":41,"street":"Pheasant Tail Trace","feat":"Pheasant Tail Trace - Steep","acres":3.24,"price":178200,"grade":"C"},{"n":42,"street":"Pheasant Tail Trace","feat":"Pheasant Tail Trace - Steep","acres":3.28,"price":180400,"grade":"C"},{"n":43,"street":"Pheasant Tail Trace","feat":"Pheasant Tail Trace - Steep","acres":3.91,"price":175950,"grade":"D"},{"n":44,"street":"Pheasant Tail Trace","feat":"Pheasant Tail Trace - Steep","acres":3.52,"price":158400,"grade":"D"},{"n":45,"street":"Pheasant Tail Trace","feat":"Pheasant Tail Trace - Steep","acres":3.15,"price":141750,"grade":"D"},{"n":46,"street":"Pheasant Tail Trace","feat":"Mountain Base","acres":3.06,"price":198900,"grade":"B"},{"n":47,"street":"Pheasant Tail Trace","feat":"Mountain Base","acres":3.1,"price":201500,"grade":"B"},{"n":48,"street":"Pheasant Tail Trace","feat":"Mountain Base","acres":3.54,"price":230100,"grade":"B"}];
+const tbody=document.getElementById('tbody');
+const money=n=>'$'+n.toLocaleString('en-US');
+let sortKey='n',sortDir=1,streetFilter='all',q='';
+function render(){
+  const rows=LOTS.filter(l=>(streetFilter==='all'||l.street===streetFilter)&&(!q||String(l.n)===q||String(l.n).startsWith(q)))
+    .sort((a,b)=>{let x=a[sortKey],y=b[sortKey];if(typeof x==='string'){x=x.toLowerCase();y=y.toLowerCase();}return x<y?-1*sortDir:x>y?1*sortDir:0;});
+  tbody.innerHTML=rows.map(l=>'<tr>'+
+    '<td class="num cell-lot"><span class="lotno">'+l.n+'</span></td>'+
+    '<td class="feat" data-label="Setting">'+l.feat+'</td>'+
+    '<td class="street" data-label="Road">'+l.street+'</td>'+
+    '<td class="num acres" data-label="Acres">'+l.acres.toFixed(2)+'</td>'+
+    '<td class="num" data-label="Price"><span class="price">'+money(l.price)+'</span></td>'+
+    '<td class="num cell-inq"><a class="inq" href="index.html#inquire" onclick="sessionStorage.setItem(\'lot\',\''+l.n+'\')">Inquire</a></td>'+
+  '</tr>').join('');
+}
+render();
+document.querySelectorAll('th[data-sort]').forEach(th=>th.addEventListener('click',()=>{
+  const k=th.dataset.sort;
+  if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}
+  document.querySelectorAll('th').forEach(x=>{x.classList.remove('sorted');x.querySelector('.ar')&&(x.querySelector('.ar').innerHTML='&uarr;');});
+  th.classList.add('sorted');const ar=th.querySelector('.ar');if(ar)ar.innerHTML=sortDir>0?'&uarr;':'&darr;';
+  render();
+}));
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');
+  streetFilter=c.dataset.street;render();
+}));
+document.getElementById('search').addEventListener('input',e=>{q=e.target.value.trim();render();});
+</script>
+</body>
+</html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diamond Rock Estates — Where the Blue Ridge Finds You</title>
+<meta name="description" content="Private mountain land in Ellijay, Georgia. A limited collection of forested homesites in the North Georgia mountains, ninety minutes from Atlanta." />
+
+<!-- Google Fonts: Playfair Display + Inter -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --black:#0f0e0b;
+    --green:#2d3d2e;
+    --green-deep:#222e23;
+    --stone:#b8a98a;
+    --gold:#c9a84c;
+    --cream:#f5f0e8;
+    --cream-dim:#e7dfd0;
+
+    --serif:'Playfair Display', Georgia, serif;
+    --sans:'Inter', -apple-system, sans-serif;
+
+    --maxw:1240px;
+    --pad:clamp(1.5rem, 5vw, 6rem);
+
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:var(--sans);
+    font-weight:300;
+    background:var(--cream);
+    color:var(--black);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{background:var(--gold);color:var(--black);}
+
+  /* custom scrollbar */
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--black);}
+  ::-webkit-scrollbar-thumb{background:var(--green);border:2px solid var(--black);}
+  ::-webkit-scrollbar-thumb:hover{background:var(--stone);}
+
+  img{display:block;max-width:100%;}
+
+  a{color:inherit;text-decoration:none;}
+
+  /* ---------- typography helpers ---------- */
+  .eyebrow{
+    font-family:var(--sans);
+    font-weight:400;
+    font-size:.72rem;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    display:inline-flex;
+    align-items:center;
+    gap:1rem;
+    color:var(--gold);
+  }
+  .eyebrow::before{
+    content:"";
+    width:34px;height:1px;
+    background:currentColor;
+    opacity:.6;
+  }
+
+  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.08;letter-spacing:-.01em;}
+
+  .display{
+    font-size:clamp(2.6rem, 7vw, 6rem);
+    font-weight:500;
+  }
+  .display em{font-style:italic;font-weight:400;}
+
+  .section-title{
+    font-size:clamp(2.1rem, 5vw, 4rem);
+    font-weight:500;
+  }
+
+  p{font-size:clamp(1rem,1.05vw,1.12rem);}
+  p + p{margin-top:1.4rem;}
+
+  /* diamond mark */
+  .diamond{display:inline-block;}
+  .diamond svg{display:block;}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    --c:var(--gold);
+    display:inline-flex;
+    align-items:center;
+    gap:.9rem;
+    font-family:var(--sans);
+    font-weight:400;
+    font-size:.74rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    padding:1.15rem 2.4rem;
+    border:1px solid var(--c);
+    color:var(--c);
+    background:transparent;
+    cursor:pointer;
+    position:relative;
+    overflow:hidden;
+    transition:color .6s var(--ease);
+    z-index:0;
+  }
+  .btn::after{
+    content:"";
+    position:absolute;inset:0;
+    background:var(--c);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .6s var(--ease);
+    z-index:-1;
+  }
+  .btn:hover{color:var(--black);}
+  .btn:hover::after{transform:scaleX(1);}
+  .btn .arrow{transition:transform .5s var(--ease);}
+  .btn:hover .arrow{transform:translateX(5px);}
+
+  .btn-solid{
+    background:var(--gold);
+    color:var(--black);
+    border-color:var(--gold);
+  }
+  .btn-solid::after{background:var(--cream);}
+  .btn-solid:hover{color:var(--black);}
+
+  /* =========================================================
+     NAV
+  ==========================================================*/
+  .nav{
+    position:fixed;top:0;left:0;right:0;
+    z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.5rem var(--pad);
+    transition:background .6s var(--ease), padding .6s var(--ease), border-color .6s var(--ease);
+    border-bottom:1px solid transparent;
+  }
+  .nav.scrolled{
+    background:rgba(15,14,11,.88);
+    backdrop-filter:blur(12px);
+    padding:1.05rem var(--pad);
+    border-bottom:1px solid rgba(201,168,76,.18);
+  }
+  .nav-logo{
+    display:flex;align-items:center;gap:.7rem;
+    color:var(--cream);
+  }
+  .nav-logo .wordmark{
+    font-family:var(--sans);
+    font-weight:400;
+    font-size:.78rem;
+    letter-spacing:.34em;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+  .nav-links{
+    display:flex;align-items:center;gap:2.6rem;
+  }
+  .nav-links a{
+    color:var(--cream);
+    font-size:.74rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    font-weight:400;
+    position:relative;
+    padding:.3rem 0;
+    opacity:.82;
+    transition:opacity .4s var(--ease);
+  }
+  .nav-links a::after{
+    content:"";
+    position:absolute;left:0;bottom:0;
+    width:100%;height:1px;
+    background:var(--gold);
+    transform:scaleX(0);
+    transform-origin:right;
+    transition:transform .5s var(--ease);
+  }
+  .nav-links a:hover{opacity:1;}
+  .nav-links a:hover::after{transform:scaleX(1);transform-origin:left;}
+
+  /* =========================================================
+     HERO
+  ==========================================================*/
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:0 var(--pad);
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:cover;object-position:center 40%;
+    transform:scale(1.08);
+    will-change:transform;
+    z-index:-2;
+  }
+  .hero-overlay{
+    position:absolute;inset:0;z-index:-1;
+    background:
+      linear-gradient(180deg, rgba(15,14,11,.55) 0%, rgba(15,14,11,.25) 35%, rgba(15,14,11,.7) 100%),
+      radial-gradient(120% 80% at 50% 120%, rgba(45,61,46,.55), transparent 60%);
+  }
+  .hero-inner{max-width:var(--maxw);width:100%;margin:0 auto;}
+  .hero .eyebrow{color:var(--gold);margin-bottom:2rem;}
+  .hero h1{
+    max-width:14ch;
+    margin-bottom:1.6rem;
+    text-shadow:0 2px 40px rgba(0,0,0,.4);
+  }
+  .hero-sub{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:clamp(1.15rem,2vw,1.6rem);
+    color:var(--cream-dim);
+    margin-bottom:3rem;
+    font-weight:400;
+  }
+  .scroll-cue{
+    position:absolute;
+    bottom:2.4rem;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:.9rem;
+    color:var(--cream);
+    opacity:.7;
+    font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;
+  }
+  .scroll-cue .line{
+    width:1px;height:48px;
+    background:linear-gradient(var(--gold),transparent);
+    animation:cue 2.4s var(--ease) infinite;
+    transform-origin:top;
+  }
+  @keyframes cue{
+    0%{transform:scaleY(0);opacity:0;}
+    40%{transform:scaleY(1);opacity:1;}
+    100%{transform:scaleY(1) translateY(20px);opacity:0;}
+  }
+
+  /* =========================================================
+     STORY
+  ==========================================================*/
+  .story{
+    background:var(--cream);
+    padding:clamp(6rem,14vh,12rem) var(--pad);
+    text-align:center;
+  }
+  .story-inner{max-width:760px;margin:0 auto;}
+  .story .eyebrow{justify-content:center;color:var(--green);margin-bottom:2.2rem;}
+  .story .eyebrow::before{background:var(--stone);}
+  .story h2{margin-bottom:2.6rem;}
+  .story p{color:#3a382f;max-width:60ch;margin-left:auto;margin-right:auto;}
+  .pullquote{
+    font-family:var(--serif);
+    font-style:italic;
+    font-weight:400;
+    font-size:clamp(1.6rem,3.4vw,2.5rem);
+    line-height:1.35;
+    color:var(--green);
+    max-width:20ch;
+    margin:4.5rem auto 0;
+    position:relative;
+  }
+  .pullquote .markrow{margin-bottom:1.6rem;}
+
+  /* =========================================================
+     THE LAND
+  ==========================================================*/
+  .land{
+    background:var(--green);
+    color:var(--cream);
+    padding:clamp(6rem,14vh,11rem) var(--pad);
+    position:relative;
+    isolation:isolate;
+  }
+  .land::before{
+    content:"";position:absolute;inset:0;z-index:-1;
+    background-image:radial-gradient(rgba(245,240,232,.04) 1px, transparent 1px);
+    background-size:22px 22px;
+    opacity:.6;
+  }
+  .land-inner{max-width:var(--maxw);margin:0 auto;}
+  .land-head{
+    display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+    gap:2rem;margin-bottom:4.5rem;
+  }
+  .land .eyebrow{color:var(--gold);margin-bottom:1.6rem;}
+  .land-head .lede{max-width:34ch;color:var(--cream-dim);font-size:1.05rem;}
+  .features{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:rgba(245,240,232,.12);
+    border:1px solid rgba(245,240,232,.12);
+  }
+  .feature{
+    background:var(--green);
+    padding:2.6rem 2.2rem;
+    transition:background .6s var(--ease);
+  }
+  .feature:hover{background:var(--green-deep);}
+  .feature .num{
+    font-family:var(--sans);
+    font-size:.66rem;letter-spacing:.3em;
+    color:var(--gold);opacity:.8;
+    display:block;margin-bottom:1.6rem;
+  }
+  .feature h3{
+    font-size:1.55rem;
+    margin-bottom:.5rem;
+    color:var(--cream);
+  }
+  .feature p{font-size:.92rem;color:var(--stone);}
+  .land-cta{margin-top:4.5rem;text-align:center;}
+
+  /* =========================================================
+     TOWN
+  ==========================================================*/
+  .town{
+    position:relative;
+    min-height:92vh;
+    display:flex;align-items:flex-end;
+    padding:clamp(4rem,10vh,9rem) var(--pad);
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .town-bg{
+    position:absolute;inset:0;z-index:-2;
+    background:url('https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a?w=2000&q=80&auto=format&fit=crop') center/cover no-repeat;
+  }
+  .town-overlay{
+    position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(0deg, rgba(15,14,11,.85) 0%, rgba(15,14,11,.35) 55%, rgba(15,14,11,.55) 100%);
+  }
+  .town-inner{max-width:980px;margin:0 auto;width:100%;}
+  .town .eyebrow{color:var(--gold);margin-bottom:1.8rem;}
+  .town h2{margin-bottom:2rem;max-width:16ch;}
+  .town-cols{
+    display:grid;grid-template-columns:1fr 1fr;gap:2.6rem;
+    max-width:760px;
+  }
+  .town-cols h3{
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:.78rem;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:1rem;
+  }
+  .town-cols p{color:var(--cream-dim);font-size:1rem;}
+
+  /* =========================================================
+     FILM BAND (creek)
+  ==========================================================*/
+  .filmband{
+    position:relative;
+    min-height:88vh;
+    display:flex;align-items:flex-end;
+    padding:clamp(3.5rem,9vh,7rem) var(--pad);
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .filmband-bg{
+    position:absolute;inset:0;z-index:-2;
+    width:100%;height:100%;object-fit:cover;
+  }
+  .filmband-overlay{
+    position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(0deg, rgba(15,14,11,.8) 0%, rgba(15,14,11,.2) 55%, rgba(15,14,11,.5) 100%);
+  }
+  .filmband-inner{max-width:var(--maxw);margin:0 auto;width:100%;}
+  .filmband .eyebrow{color:var(--gold);margin-bottom:1.6rem;}
+  .filmband h2{max-width:16ch;margin-bottom:1.4rem;}
+  .filmband .filmband-cap{
+    font-family:var(--serif);font-style:italic;
+    font-size:clamp(1.15rem,2vw,1.5rem);
+    color:var(--cream-dim);max-width:40ch;
+  }
+
+  /* =========================================================
+     GALLERY
+  ==========================================================*/
+  .gallery{
+    background:var(--black);
+    padding:clamp(5rem,12vh,9rem) 0 clamp(6rem,12vh,9rem);
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .gallery-head{
+    max-width:var(--maxw);margin:0 auto 3.5rem;padding:0 var(--pad);
+  }
+  .gallery .eyebrow{color:var(--gold);margin-bottom:1.6rem;}
+  .gallery-head h2{max-width:18ch;}
+  .gallery-scroll{
+    display:flex;gap:1.5rem;
+    padding:0 var(--pad) 1.5rem;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gallery-scroll::-webkit-scrollbar{height:6px;}
+  .gallery-scroll::-webkit-scrollbar-thumb{background:var(--green);}
+  .gframe{
+    position:relative;
+    flex:0 0 clamp(280px,46vw,520px);
+    aspect-ratio:4/5;
+    scroll-snap-align:center;
+    overflow:hidden;
+  }
+  .gframe img{
+    width:100%;height:100%;object-fit:cover;
+    transition:transform 1.2s var(--ease);
+    filter:saturate(.95);
+  }
+  .gframe:hover img{transform:scale(1.05);}
+  .gframe figcaption{
+    position:absolute;left:1.6rem;bottom:1.4rem;right:1.6rem;
+    font-family:var(--serif);font-style:italic;
+    font-size:1.05rem;color:var(--cream);
+    text-shadow:0 1px 14px rgba(0,0,0,.6);
+  }
+  .gframe::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(0deg,rgba(15,14,11,.7),transparent 45%);
+  }
+  .gallery-note{
+    max-width:var(--maxw);margin:2rem auto 0;padding:0 var(--pad);
+    font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--stone);opacity:.7;
+    display:flex;align-items:center;gap:.8rem;
+  }
+
+  /* =========================================================
+     INQUIRY
+  ==========================================================*/
+  .inquiry{
+    background:var(--black);
+    padding:clamp(6rem,14vh,12rem) var(--pad);
+    color:var(--cream);
+    text-align:center;
+    border-top:1px solid rgba(201,168,76,.16);
+  }
+  .inquiry-inner{max-width:620px;margin:0 auto;}
+  .inquiry .eyebrow{justify-content:center;color:var(--gold);margin-bottom:2rem;}
+  .inquiry h2{margin-bottom:1.4rem;}
+  .inquiry .sub{color:var(--stone);max-width:46ch;margin:0 auto 3.5rem;}
+  form{display:grid;gap:2.2rem;text-align:left;}
+  .field{position:relative;}
+  .field input,.field textarea{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid rgba(245,240,232,.28);
+    color:var(--cream);
+    font-family:var(--sans);
+    font-weight:300;
+    font-size:1rem;
+    padding:.7rem 0;
+    transition:border-color .5s var(--ease);
+  }
+  .field textarea{resize:vertical;min-height:54px;}
+  .field input:focus,.field textarea:focus{outline:none;border-bottom-color:var(--gold);}
+  .field label{
+    position:absolute;left:0;top:.7rem;
+    color:var(--stone);
+    font-size:1rem;
+    pointer-events:none;
+    transition:all .4s var(--ease);
+  }
+  .field input:focus + label,
+  .field input:not(:placeholder-shown) + label,
+  .field textarea:focus + label,
+  .field textarea:not(:placeholder-shown) + label{
+    top:-1rem;font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);
+  }
+  .form-submit{margin-top:1rem;justify-self:center;}
+  .form-note{
+    margin-top:3.5rem;
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--stone);opacity:.7;
+  }
+  .form-thanks{
+    display:none;
+    font-family:var(--serif);font-style:italic;
+    font-size:clamp(1.4rem,3vw,2rem);
+    color:var(--gold);
+    padding:3rem 0;
+    line-height:1.4;
+  }
+  .form-thanks.show{display:block;animation:fadein 1s var(--ease);}
+  @keyframes fadein{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+  /* =========================================================
+     FOOTER
+  ==========================================================*/
+  footer{
+    background:#0a0908;
+    color:var(--cream);
+    padding:clamp(3.5rem,8vh,5.5rem) var(--pad) 2.5rem;
+    text-align:center;
+  }
+  .footer-mark{
+    display:inline-flex;flex-direction:column;align-items:center;gap:1rem;
+    margin-bottom:2.4rem;
+  }
+  .footer-mark .wordmark{
+    font-family:var(--sans);font-weight:400;
+    font-size:.82rem;letter-spacing:.4em;text-transform:uppercase;
+  }
+  .footer-divider{
+    width:60px;height:1px;background:var(--gold);margin:0 auto 2.4rem;
+  }
+  .footer-nav{
+    display:flex;justify-content:center;gap:2.4rem;flex-wrap:wrap;
+    margin-bottom:2.4rem;
+  }
+  .footer-nav a{
+    font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--stone);transition:color .4s var(--ease);
+  }
+  .footer-nav a:hover{color:var(--gold);}
+  .copyright{font-size:.7rem;letter-spacing:.16em;color:var(--stone);opacity:.6;}
+
+  /* =========================================================
+     SCROLL REVEAL
+  ==========================================================*/
+  .reveal{
+    opacity:0;
+    transform:translateY(34px);
+    transition:opacity 1.1s var(--ease), transform 1.1s var(--ease);
+  }
+  .reveal.in{opacity:1;transform:none;}
+  .reveal.d1{transition-delay:.12s;}
+  .reveal.d2{transition-delay:.24s;}
+  .reveal.d3{transition-delay:.36s;}
+  .reveal.d4{transition-delay:.48s;}
+  .reveal.d5{transition-delay:.6s;}
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none;}
+    html{scroll-behavior:auto;}
+    .scroll-cue .line{animation:none;}
+  }
+
+  /* =========================================================
+     RESPONSIVE
+  ==========================================================*/
+  @media (max-width:860px){
+    .features{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:680px){
+    .nav-links{gap:1.2rem;}
+    .nav-links a{font-size:.62rem;letter-spacing:.16em;}
+    .nav-logo .wordmark{font-size:.66rem;letter-spacing:.24em;}
+    .features{grid-template-columns:1fr;}
+    .town-cols{grid-template-columns:1fr;gap:2rem;}
+    .hero h1{max-width:18ch;}
+  }
+  @media (max-width:430px){
+    .nav-links a:nth-child(1),
+    .nav-links a:nth-child(2){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav">
+  <a href="#hero" class="nav-logo" aria-label="Diamond Rock Estates home">
+    <span class="diamond" aria-hidden="true">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round">
+        <path d="M5 9 L12 3 L19 9 L12 21 Z"/>
+        <path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/>
+      </svg>
+    </span>
+    <span class="wordmark">Diamond Rock Estates</span>
+  </a>
+  <div class="nav-links">
+    <a href="#land">Land</a>
+    <a href="#location">Location</a>
+    <a href="lots.html">The Lots</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="who-we-are.html">Who We Are</a>
+    <a href="#inquire">Inquire</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="hero">
+  <video class="hero-bg" id="heroBg" autoplay muted loop playsinline preload="auto" poster="media/mountains-poster.jpg">
+    <source src="media/mountains.mp4" type="video/mp4" />
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <span class="eyebrow reveal in">Private Mountain Land · Ellijay, Georgia</span>
+    <h1 class="display reveal in d1">Where the Blue Ridge <em>finds you</em></h1>
+    <p class="hero-sub reveal in d2">Private mountain land in Ellijay, Georgia.</p>
+    <a href="#story" class="btn reveal in d3">
+      Explore the Land
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+  <div class="scroll-cue" aria-hidden="true">
+    <span>Scroll</span>
+    <span class="line"></span>
+  </div>
+</header>
+
+<!-- ============ STORY ============ -->
+<section class="story" id="story">
+  <div class="story-inner">
+    <span class="eyebrow reveal">The Story</span>
+    <h2 class="section-title reveal d1">A Place Apart</h2>
+    <p class="reveal d2">There is a kind of quiet you only find above two thousand feet. It arrives at the edge of the hardwood forest, where the morning fog lifts off the ridgeline and the air turns cool against your skin. Here, the days are measured in birdsong and the slow turn of the light. This is the North Georgia you remember — or the one you have always meant to find.</p>
+    <p class="reveal d2">Diamond Rock Estates is a small collection of forested homesites set into the hills outside Ellijay, the Apple Capital of Georgia. Rock outcroppings, old oaks, long views. A place to build slowly and stay long. Twenty-five minutes on, the restored streets of Blue Ridge wait with their scenic railway, their farm tables, their unhurried afternoons.</p>
+    <p class="reveal d2">Own a piece of it. Light a fire as the stars come out. Let the mountain do the rest.</p>
+
+    <blockquote class="pullquote reveal d3">
+      <span class="markrow diamond" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round">
+          <path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19"/>
+        </svg>
+      </span>
+      “The mountain doesn’t ask for much — only that you come.”
+    </blockquote>
+  </div>
+</section>
+
+<!-- ============ FILM BAND (expanse / long-range) ============ -->
+<section class="filmband">
+  <video class="filmband-bg" autoplay muted loop playsinline preload="metadata" poster="media/expanse-poster.jpg">
+    <source src="media/expanse.mp4" type="video/mp4" />
+  </video>
+  <div class="filmband-overlay"></div>
+  <div class="filmband-inner">
+    <span class="eyebrow reveal">The Expanse</span>
+    <h2 class="section-title reveal d1">Quiet, for miles</h2>
+    <p class="filmband-cap reveal d2">Ridge after ridge, fading to the blue edge of the horizon — the long view that shifts with the light and asks nothing of you.</p>
+  </div>
+</section>
+
+<!-- ============ THE LAND ============ -->
+<section class="land" id="land">
+  <div class="land-inner">
+    <div class="land-head">
+      <div>
+        <span class="eyebrow reveal">The Land</span>
+        <h2 class="section-title reveal d1">The Lots</h2>
+      </div>
+      <p class="lede reveal d2">Gentle homesites carved from hardwood forest and granite, each chosen for its outlook and its calm.</p>
+    </div>
+
+    <div class="features">
+      <div class="feature reveal">
+        <span class="num">01</span>
+        <h3>2–10 Acre Homesites</h3>
+        <p>Room to breathe, to build, to leave the trees standing.</p>
+      </div>
+      <div class="feature reveal d1">
+        <span class="num">02</span>
+        <h3>2,000+ Feet Above Sea Level</h3>
+        <p>Cooler air, longer views, and a horizon that is yours.</p>
+      </div>
+      <div class="feature reveal d2">
+        <span class="num">03</span>
+        <h3>Hardwood Forest &amp; Rock Outcroppings</h3>
+        <p>Mature oak and poplar, granite ledges, natural privacy.</p>
+      </div>
+      <div class="feature reveal">
+        <span class="num">04</span>
+        <h3>Underground Electric, Paved Roads</h3>
+        <p>The infrastructure is quiet, so the land stays loud with birdsong.</p>
+      </div>
+      <div class="feature reveal d1">
+        <span class="num">05</span>
+        <h3>Gated Community</h3>
+        <p>A single entrance, a short list of neighbors, a long sense of peace.</p>
+      </div>
+      <div class="feature reveal d2">
+        <span class="num">06</span>
+        <h3>1.5 Hours from Atlanta</h3>
+        <p>Close enough for the weekend. Far enough to forget the week.</p>
+      </div>
+    </div>
+
+    <div class="land-cta reveal">
+      <a href="lots.html" class="btn">
+        View Available Parcels
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FILM BAND (creek) ============ -->
+<section class="filmband">
+  <video class="filmband-bg" autoplay muted loop playsinline preload="metadata" poster="media/creek-poster.jpg">
+    <source src="media/creek.mp4" type="video/mp4" />
+  </video>
+  <div class="filmband-overlay"></div>
+  <div class="filmband-inner">
+    <span class="eyebrow reveal">The Water</span>
+    <h2 class="section-title reveal d1">A creek of your own</h2>
+    <p class="filmband-cap reveal d2">Cold and unhurried, it threads the hollows below the ridge — the kind of sound you forget you were missing until it is the only one left.</p>
+  </div>
+</section>
+
+<!-- ============ TOWN / LOCATION ============ -->
+<section class="town" id="location">
+  <div class="town-bg"></div>
+  <div class="town-overlay"></div>
+  <div class="town-inner">
+    <span class="eyebrow reveal">Ellijay &amp; Blue Ridge</span>
+    <h2 class="section-title reveal d1">The Town at Your Doorstep</h2>
+    <div class="town-cols">
+      <div class="reveal d2">
+        <h3>Ellijay</h3>
+        <p>Apple orchards in the fall and trailheads year round. The Cohutta Wilderness and Appalachian Trail begin nearby, vineyards line the back roads, and the festival calendar fills every season with something worth the drive.</p>
+      </div>
+      <div class="reveal d3">
+        <h3>Blue Ridge</h3>
+        <p>Twenty-five minutes north: the Scenic Railway, tubing on the Toccoa, antique shops and quiet boutique dining, and a lake made for slow mornings. The Chattahoochee National Forest wraps it all.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="gallery">
+  <div class="gallery-head">
+    <span class="eyebrow reveal">The Setting</span>
+    <h2 class="section-title reveal d1">Nature, Up Close</h2>
+  </div>
+  <div class="gallery-scroll" id="gallery">
+    <figure class="gframe reveal">
+      <img src="media/gallery/thumb/g01.jpg" alt="Long-range view of layered Blue Ridge mountains" loading="lazy" />
+      <figcaption>The long blue distance.</figcaption>
+    </figure>
+    <figure class="gframe reveal d1">
+      <img src="media/gallery/thumb/g05.jpg" alt="The covered timber entrance gate" loading="lazy" />
+      <figcaption>The covered gate.</figcaption>
+    </figure>
+    <figure class="gframe reveal d2">
+      <img src="media/gallery/thumb/g03.jpg" alt="Layered ridgelines fading to the horizon" loading="lazy" />
+      <figcaption>Layer upon layer.</figcaption>
+    </figure>
+    <figure class="gframe reveal d3">
+      <img src="media/gallery/thumb/g06.jpg" alt="The creek running over stone" loading="lazy" />
+      <figcaption>Water over stone.</figcaption>
+    </figure>
+    <figure class="gframe reveal d4">
+      <img src="media/gallery/thumb/g04.jpg" alt="Aerial of the lots with boundaries drawn" loading="lazy" />
+      <figcaption>The lots, from above.</figcaption>
+    </figure>
+    <figure class="gframe reveal d5">
+      <img src="media/gallery/thumb/g02.jpg" alt="A cleared homesite with a mountain horizon" loading="lazy" />
+      <figcaption>A homesite with a horizon.</figcaption>
+    </figure>
+  </div>
+  <p class="gallery-note reveal">
+    <a href="gallery.html" style="display:inline-flex;align-items:center;gap:.7rem;color:var(--gold);letter-spacing:.24em;text-transform:uppercase;font-size:.74rem;border-bottom:1px solid rgba(201,168,76,.4);padding-bottom:.3rem;">
+      <span class="diamond" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.4" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/></svg></span>
+      View the full gallery &nbsp;&rarr;
+    </a>
+  </p>
+</section>
+
+<!-- ============ INQUIRY ============ -->
+<section class="inquiry" id="inquire">
+  <div class="inquiry-inner">
+    <span class="eyebrow reveal">Inquire</span>
+    <h2 class="section-title reveal d1">Own Your Ridge</h2>
+    <p class="sub reveal d2">A limited number of homesites remain. Inquire for pricing and availability.</p>
+
+    <form id="inquiryForm" class="reveal d2" novalidate>
+      <div class="field">
+        <input type="text" id="name" name="name" placeholder=" " required />
+        <label for="name">Name</label>
+      </div>
+      <div class="field">
+        <input type="email" id="email" name="email" placeholder=" " required />
+        <label for="email">Email</label>
+      </div>
+      <div class="field">
+        <input type="tel" id="phone" name="phone" placeholder=" " />
+        <label for="phone">Phone</label>
+      </div>
+      <div class="field">
+        <textarea id="message" name="message" rows="2" placeholder=" "></textarea>
+        <label for="message">Message</label>
+      </div>
+      <button type="submit" class="btn btn-solid form-submit">
+        Send Inquiry
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+    </form>
+
+    <p class="form-thanks" id="formThanks">Thank you — we’ll be in touch.</p>
+
+    <p class="form-note">Diamond Rock Estates · Ellijay, Georgia · diamondrock@email.com</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-mark">
+    <span class="diamond" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linejoin="round">
+        <path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/>
+      </svg>
+    </span>
+    <span class="wordmark">Diamond Rock Estates</span>
+  </div>
+  <div class="footer-divider"></div>
+  <nav class="footer-nav">
+    <a href="#land">Land</a>
+    <a href="#location">Location</a>
+    <a href="lots.html">The Lots</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="who-we-are.html">Who We Are</a>
+    <a href="#inquire">Inquire</a>
+  </nav>
+  <p class="copyright">© 2025 Diamond Rock Estates. All rights reserved.</p>
+</footer>
+
+<script>
+  // ---- Sticky nav: transparent over hero, dark on scroll ----
+  const nav = document.getElementById('nav');
+  const onScroll = () => {
+    nav.classList.toggle('scrolled', window.scrollY > window.innerHeight * 0.7);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- Subtle hero parallax ----
+  const heroBg = document.getElementById('heroBg');
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (y < window.innerHeight * 1.2) {
+          heroBg.style.transform = `scale(1.08) translateY(${y * 0.18}px)`;
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // ---- Scroll-triggered fade-ins ----
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+
+  document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
+
+  // ---- Form submission (no backend) ----
+  const form = document.getElementById('inquiryForm');
+  const thanks = document.getElementById('formThanks');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    if (!name || !email) {
+      const firstEmpty = !name ? form.name : form.email;
+      firstEmpty.focus();
+      firstEmpty.style.borderBottomColor = '#c9a84c';
+      return;
+    }
+    form.style.transition = 'opacity .5s ease';
+    form.style.opacity = '0';
+    setTimeout(() => {
+      form.style.display = 'none';
+      thanks.classList.add('show');
+    }, 500);
+  });
+
+  // ---- Respect reduced-motion: hold on the poster frame ----
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('video').forEach(v => {
+      v.removeAttribute('autoplay');
+      v.pause();
+    });
+  }
+</script>
+<script>
+  // Pre-fill inquiry when arriving from a specific lot (set on the Lots page)
+  (function(){try{var lot=sessionStorage.getItem('lot');if(lot){var m=document.getElementById('message');if(m&&!m.value){m.value="I'm interested in Lot "+lot+".";var lbl=m.nextElementSibling;}sessionStorage.removeItem('lot');if(location.hash==='#inquire'){var el=document.getElementById('inquire');if(el)setTimeout(function(){el.scrollIntoView();},200);}}}catch(e){}})();
+</script>
+</body>
+</html>

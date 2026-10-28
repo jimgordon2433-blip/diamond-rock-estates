@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Diamond Rock Estates — Lot Map</title>
+<meta name="description" content="Interactive lot map for Diamond Rock Estates — explore each homesite, its acreage, features, and current availability." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#2b2a24;--ink-soft:#5a564a;--line:#3a382f;--paper:#ffffff;--paper-2:#f6f3ec;
+    --green:#2d3d2e;--gold:#b8923a;--gold-br:#c9a84c;--stone:#b8a98a;
+    --avail:#4e7f52;--under:#c9a84c;--sold:#c0392b;--coming:#8a8372;
+    --serif:'Playfair Display',Georgia,serif;--sans:'Inter',-apple-system,sans-serif;
+    --ease:cubic-bezier(.22,1,.36,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:var(--sans);font-weight:300;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden;}
+  a{color:inherit;text-decoration:none;}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;}
+
+  /* ---- MAP STAGE (fills the frame; no nav, no footer) ---- */
+  .stage{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--paper);}
+  .map-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;cursor:grab;background:var(--paper);}
+  .map-scroll.panning{cursor:grabbing;}
+  .map-inner{width:100%;transition:width .25s var(--ease);line-height:0;}
+  svg.plat{display:block;width:100%;height:auto;user-select:none;}
+  .pimg{opacity:.5;}
+
+  /* parcels */
+  .lot{cursor:pointer;stroke:var(--line);stroke-width:1.6;stroke-linejoin:round;transition:fill-opacity .2s var(--ease),stroke-width .2s,stroke .2s;}
+  .lot.s-available{fill:var(--avail);fill-opacity:0;}
+  .lot.s-under{fill:var(--under);fill-opacity:.16;}
+  .lot.s-sold{fill:var(--sold);fill-opacity:.14;}
+  .lot.s-coming{fill:var(--coming);fill-opacity:.14;}
+  .lot:hover{fill-opacity:.30;stroke:var(--gold);stroke-width:2.6;}
+  .lot.dimmed{fill-opacity:0!important;stroke-opacity:.18;}
+  .lot.selected{fill-opacity:.34;stroke:var(--gold);stroke-width:3.2;}
+
+  /* number + acreage label (flyer style) */
+  .label{pointer-events:none;}
+  .label circle{fill:#fff;stroke:var(--line);stroke-width:1.6;}
+  .label .num{font-family:var(--sans);font-weight:600;fill:var(--ink);text-anchor:middle;dominant-baseline:central;font-size:19px;}
+  .label .ac{font-family:var(--sans);font-weight:400;fill:var(--ink-soft);text-anchor:middle;font-size:13px;letter-spacing:.02em;}
+  .label.dimmed{opacity:.2;}
+  .label .dotstatus{stroke:#fff;stroke-width:1.5;}
+  .st-available .dotstatus{fill:var(--avail);} .st-under .dotstatus{fill:var(--under);}
+  .st-sold .dotstatus{fill:var(--sold);} .st-coming .dotstatus{fill:var(--coming);}
+
+  /* SOLD burst */
+  .burst{pointer-events:none;}
+  .burst polygon{fill:var(--sold);stroke:#fff;stroke-width:1.5;}
+  .burst text{fill:#fff;font-family:var(--sans);font-weight:700;font-size:13px;text-anchor:middle;dominant-baseline:central;letter-spacing:.04em;}
+  .burst.dimmed{opacity:.2;}
+
+  /* ---- floating controls ---- */
+  .ctl{position:absolute;z-index:8;}
+  .title{top:16px;left:18px;display:flex;align-items:center;gap:.65rem;background:rgba(255,255,255,.9);backdrop-filter:blur(6px);border:1px solid rgba(58,56,47,.14);border-radius:4px;padding:.55rem .85rem;}
+  .title .diamond svg{display:block;}
+  .title .wm{font-family:var(--sans);font-weight:500;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--green);padding-left:.1em;white-space:nowrap;}
+  .title .tg{font-family:var(--serif);font-style:italic;font-size:.78rem;color:var(--ink-soft);margin-left:.1rem;}
+
+  .topright{top:16px;right:18px;display:flex;gap:.5rem;align-items:center;}
+  .search{display:flex;align-items:center;gap:.45rem;background:#fff;border:1px solid rgba(58,56,47,.18);border-radius:4px;padding:.5rem .7rem;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+  .search svg{opacity:.5;display:block;}
+  .search input{border:none;background:transparent;outline:none;font-family:var(--sans);font-size:.85rem;color:var(--ink);width:104px;}
+  .search input::placeholder{color:#9a958a;}
+  .tbtn{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid rgba(58,56,47,.18);color:var(--ink);padding:.5rem .8rem;border-radius:4px;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:border-color .3s,background .3s;}
+  .tbtn:hover{border-color:var(--gold-br);}
+  .tbtn.on{background:var(--gold-br);border-color:var(--gold-br);color:#1a1a16;}
+
+  .legend{left:18px;bottom:18px;background:rgba(255,255,255,.95);backdrop-filter:blur(6px);border:1px solid rgba(58,56,47,.16);border-radius:5px;padding:.75rem .5rem;min-width:206px;box-shadow:0 3px 16px rgba(0,0,0,.1);}
+  .legend h4{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);padding:.1rem .7rem .55rem;font-weight:600;}
+  .lrow{display:flex;align-items:center;gap:.65rem;padding:.42rem .7rem;cursor:pointer;border-radius:3px;transition:background .25s var(--ease);}
+  .lrow:hover{background:rgba(58,56,47,.05);}
+  .lrow .sw{width:14px;height:14px;border-radius:50%;flex:none;border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(58,56,47,.3);}
+  .lrow .nm{font-size:.76rem;letter-spacing:.04em;color:var(--ink);flex:1;}
+  .lrow .ct{font-size:.76rem;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+  .lrow[aria-pressed="false"]{opacity:.42;}
+  .lrow.avail .sw{background:var(--avail);} .lrow.under .sw{background:var(--under);}
+  .lrow.sold .sw{background:var(--sold);} .lrow.coming .sw{background:var(--coming);}
+
+  .zoomctl{right:18px;bottom:18px;display:flex;flex-direction:column;gap:6px;}
+  .zoomctl button{width:40px;height:40px;border:1px solid rgba(58,56,47,.18);background:#fff;color:var(--green);font-size:1.3rem;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 8px rgba(0,0,0,.1);}
+  .zoomctl button:hover{border-color:var(--gold-br);}
+  .zoomctl button.rst{font-size:.54rem;letter-spacing:.1em;}
+
+  .tip{position:fixed;z-index:30;pointer-events:none;background:var(--ink);color:#fff;border-radius:4px;padding:.45rem .65rem;font-size:.74rem;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .15s ease;box-shadow:0 2px 10px rgba(0,0,0,.2);}
+  .tip.show{opacity:1;transform:none;} .tip b{font-weight:600;}
+
+  /* ---- drawer (light) ---- */
+  .scrim{position:fixed;inset:0;background:rgba(20,18,14,.4);opacity:0;visibility:hidden;transition:opacity .4s var(--ease),visibility .4s;z-index:40;}
+  .scrim.open{opacity:1;visibility:visible;}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(410px,92vw);background:var(--paper-2);border-left:1px solid rgba(184,146,58,.4);z-index:50;transform:translateX(100%);transition:transform .5s var(--ease);overflow-y:auto;box-shadow:-10px 0 40px rgba(0,0,0,.14);}
+  .drawer.open{transform:none;}
+  .drawer-in{padding:clamp(1.8rem,5vw,2.8rem);}
+  .drawer .close{position:absolute;top:1.1rem;right:1.1rem;width:36px;height:36px;border:1px solid rgba(58,56,47,.25);background:transparent;color:var(--ink);cursor:pointer;border-radius:50%;font-size:1.1rem;}
+  .drawer .close:hover{border-color:var(--gold);color:var(--gold);}
+  .d-eyebrow{font-size:.66rem;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);}
+  .d-lotno{font-family:var(--serif);font-size:clamp(2.6rem,8vw,3.4rem);font-weight:500;margin:.35rem 0 .2rem;color:var(--green);}
+  .status-pill{display:inline-flex;align-items:center;gap:.5rem;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;padding:.38rem .8rem;border-radius:2px;margin:.3rem 0 1.5rem;}
+  .status-pill .dot{width:9px;height:9px;border-radius:50%;}
+  .sp-available{background:rgba(78,127,82,.16);color:#3c6340;} .sp-available .dot{background:var(--avail);}
+  .sp-under{background:rgba(201,168,76,.2);color:#977516;} .sp-under .dot{background:var(--under);}
+  .sp-sold{background:rgba(192,57,43,.14);color:#a32f22;} .sp-sold .dot{background:var(--sold);}
+  .sp-coming{background:rgba(138,131,114,.18);color:#6b6456;} .sp-coming .dot{background:var(--coming);}
+  .d-facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(58,56,47,.14);border:1px solid rgba(58,56,47,.14);margin-bottom:1.6rem;}
+  .d-fact{background:var(--paper-2);padding:1rem 1.1rem;}
+  .d-fact .k{font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.3rem;}
+  .d-fact .v{font-family:var(--serif);font-size:1.3rem;color:var(--ink);}
+  .d-perks{list-style:none;margin:0 0 1.9rem;}
+  .d-perks li{display:flex;gap:.75rem;align-items:flex-start;padding:.5rem 0;border-bottom:1px solid rgba(58,56,47,.1);color:var(--ink);font-size:.94rem;}
+  .d-perks li::before{content:"";width:8px;height:8px;margin-top:.45rem;flex:none;background:var(--gold);transform:rotate(45deg);}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.9rem;font-weight:500;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;padding:1rem 1.8rem;border:1px solid var(--gold);color:#fff;background:var(--gold);cursor:pointer;width:100%;transition:background .4s,color .4s;}
+  .btn:hover{background:transparent;color:var(--gold);}
+  .btn.ghost{background:transparent;color:var(--gold);}.btn.ghost:hover{background:var(--gold);color:#fff;}
+  .d-note{color:var(--ink-soft);font-size:.78rem;margin-top:.9rem;text-align:center;}
+  .d-photos{margin:0 0 1.5rem;}
+  .d-photos .main{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;background:#e7dfd0;display:block;}
+  .d-photos .thumbs{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;}
+  .d-photos .thumbs img{width:62px;height:46px;object-fit:cover;border-radius:3px;cursor:pointer;opacity:.65;border:1px solid rgba(58,56,47,.2);transition:opacity .25s,border-color .25s;}
+  .d-photos .thumbs img:hover,.d-photos .thumbs img.on{opacity:1;border-color:var(--gold);}
+  .label .cam>circle{fill:var(--gold);stroke:#fff;stroke-width:1.2;}
+
+  @media (max-width:680px){
+    .title .wm{font-size:.6rem;letter-spacing:.18em;} .title .tg{display:none;}
+    .search input{width:76px;} .tbtn .lbl{display:none;} .tbtn{padding:.5rem .55rem;}
+    .topright{gap:.4rem;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="map-scroll" id="scroll">
+    <div class="map-inner" id="inner">
+      <svg class="plat" id="plat" viewBox="0 0 1645 1460" xmlns="http://www.w3.org/2000/svg" aria-label="Interactive lot map of Diamond Rock Estates">
+        <image class="pimg" href="media/plat-light.jpg" x="0" y="0" width="1645" height="1460" preserveAspectRatio="xMidYMid meet"></image>
+        <g id="shapes"></g>
+        <g id="bursts"></g>
+        <g id="labels"></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="ctl title">
+    <span class="diamond" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8923a" stroke-width="1" stroke-linejoin="round"><path d="M5 9 L12 3 L19 9 L12 21 Z"/><path d="M5 9 H19 M9.2 9 L12 21 M14.8 9 L12 21"/></svg></span>
+    <span class="wm">Diamond Rock Estates</span>
+    <span class="tg">The Lots</span>
+  </div>
+
+  <div class="ctl topright">
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5a564a" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="search" type="text" inputmode="numeric" placeholder="Find lot #" aria-label="Find a lot by number" />
+    </div>
+    <button class="tbtn on" id="legendBtn" aria-pressed="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="lbl">Legend</span></button>
+    <button class="tbtn" id="fsBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Full</span></button>
+  </div>
+
+  <div class="ctl legend" id="legend">
+    <h4>Availability</h4>
+    <div class="lrow avail" data-st="available" aria-pressed="true"><span class="sw"></span><span class="nm">Available</span><span class="ct" id="ct-available"></span></div>
+    <div class="lrow under" data-st="under" aria-pressed="true"><span class="sw"></span><span class="nm">Under Contract</span><span class="ct" id="ct-under"></span></div>
+    <div class="lrow sold" data-st="sold" aria-pressed="true"><span class="sw"></span><span class="nm">Sold</span><span class="ct" id="ct-sold"></span></div>
+    <div class="lrow coming" data-st="coming" aria-pressed="true"><span class="sw"></span><span class="nm">Coming Soon</span><span class="ct" id="ct-coming"></span></div>
+  </div>
+
+  <div class="ctl zoomctl">
+    <button id="zin" aria-label="Zoom in">+</button>
+    <button id="zout" aria-label="Zoom out">&minus;</button>
+    <button id="zrst" class="rst" aria-label="Reset view">RESET</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"><div class="drawer-in"><button class="close" id="dclose" aria-label="Close">&times;</button><div id="dbody"></div></div></aside>
+
+<script>
+const LOTS = {"1":{"n":1,"x":148,"y":1347,"acres":6.7,"street":"Wild Turkey Road","status":"available","price":300000,"perks":["Creek frontage / seasonal branch","Borders the national forest"],"poly":[[68,1223],[58,1416],[73,1417],[79,1431],[110,1439],[137,1459],[262,1459],[261,1347],[206,1332],[172,1284],[123,1261]]},"2":{"n":2,"x":380,"y":1407,"acres":4.3,"street":"Wild Turkey Road","status":"available","price":248000,"perks":["Creek frontage / seasonal branch","Borders the national forest"],"poly":[[526,1300],[490,1273],[452,1282],[439,1302],[372,1344],[303,1355],[274,1350],[272,1459],[483,1459],[529,1316]]},"3":{"n":3,"x":648,"y":1410,"acres":8.0,"street":"Wild Turkey Road","status":"sold","price":null,"perks":["Borders the national forest","Estate-size acreage","Granite outcroppings"],"poly":[[494,1459],[989,1451],[906,1426],[897,1459],[895,1420],[872,1423],[862,1409],[707,1362],[697,1368],[696,1358],[654,1344],[589,1372],[540,1319]]},"4":{"n":4,"x":793,"y":1248,"acres":5.6,"street":"Wild Turkey Road","status":"available","price":241000,"perks":["Private, end-of-road setting","Gentle, buildable homesite"],"poly":[[892,1135],[866,1137],[863,1126],[830,1124],[782,1135],[778,1146],[747,1147],[744,1187],[700,1243],[664,1333],[786,1371],[892,1203]]},"5":{"n":5,"x":945,"y":1285,"acres":3.2,"street":"Wild Turkey Road","status":"under","price":null,"perks":["Gentle, buildable homesite","Paved road frontage"],"poly":[[945,1145],[902,1213],[905,1409],[945,1424],[973,1424],[980,1433],[1036,1452],[1011,1150]]},"6":{"n":6,"x":1095,"y":1295,"acres":6.9,"street":"Wild Turkey Road","status":"available","price":270000,"perks":["Granite outcroppings","Gentle, buildable homesite"],"poly":[[1094,1120],[1077,1144],[1021,1152],[1048,1453],[1119,1454],[1128,1433],[1144,1437],[1131,1442],[1136,1450],[1153,1443],[1156,1452],[1160,1413],[1170,1452],[1189,1408],[1184,1351],[1131,1222],[1111,1201],[1105,1209],[1089,1199],[1099,1189],[1083,1173],[1085,1157],[1121,1192]]},"7":{"n":7,"x":1208,"y":1145,"acres":4.5,"street":"Wild Turkey Road","status":"sold","price":null,"perks":["Gentle, buildable homesite","Paved road frontage"],"poly":[[1136,1046],[1117,1064],[1100,1109],[1144,1218],[1161,1228],[1152,1239],[1161,1241],[1158,1253],[1171,1268],[1185,1325],[1209,1367],[1204,1344],[1216,1352],[1316,1120]]},"8":{"n":8,"x":1293,"y":1010,"acres":8.2,"street":"Wild Turkey Road","status":"available","price":298000,"perks":["Estate-size acreage","Private, end-of-road setting"],"poly":[[1144,1035],[1256,1084],[1403,1133],[1420,1079],[1426,989],[1394,971],[1386,979],[1348,965],[1352,985],[1344,986],[1331,968],[1340,957],[1304,935],[1232,962]]},"9":{"n":9,"x":1315,"y":1300,"acres":5.8,"street":"Wild Turkey Road","status":"coming","price":null,"perks":["Granite outcroppings","Gentle, buildable homesite"],"poly":[[1401,1151],[1370,1187],[1379,1144],[1327,1126],[1197,1421],[1210,1432],[1198,1445],[1213,1439],[1218,1454],[1287,1453],[1297,1443],[1342,1450],[1336,1401],[1351,1395],[1353,1430],[1378,1329],[1372,1340],[1363,1331],[1380,1318],[1394,1258],[1373,1235],[1371,1213],[1394,1186]]},"10":{"n":10,"x":1465,"y":1355,"acres":3.4,"street":"Wild Turkey Road","status":"available","price":253000,"perks":["Long-range ridgeline views","Borders the national forest"],"poly":[[1407,1251],[1362,1449],[1622,1452],[1615,1432],[1626,1426],[1595,1398],[1605,1417],[1589,1447],[1586,1385],[1513,1312],[1582,1371],[1579,1331],[1495,1286],[1506,1299],[1497,1304],[1425,1248],[1418,1258]]},"11":{"n":11,"x":1538,"y":1220,"acres":7.1,"street":"Wild Turkey Road","status":"available","price":334000,"perks":["Long-range ridgeline views","Borders the national forest","Estate-size acreage"],"poly":[[1444,1128],[1440,1136],[1485,1151],[1435,1151],[1427,1196],[1443,1239],[1485,1277],[1635,1358],[1633,1190],[1497,1160],[1508,1151],[1633,1179],[1634,1144]]},"12":{"n":12,"x":1552,"y":1050,"acres":4.7,"street":"Wild Turkey Road","status":"under","price":null,"perks":["Long-range ridgeline views","Borders the national forest","Granite outcroppings"],"poly":[[1632,953],[1592,962],[1591,985],[1580,980],[1583,967],[1489,983],[1486,989],[1461,988],[1456,1071],[1442,1125],[1634,1141]]},"13":{"n":13,"x":1518,"y":873,"acres":8.4,"street":"Wild Turkey Road","status":"available","price":363000,"perks":["Long-range ridgeline views","Borders the national forest","Estate-size acreage"],"poly":[[1380,893],[1405,903],[1400,916],[1441,927],[1444,940],[1477,936],[1465,965],[1445,963],[1456,980],[1582,955],[1584,916],[1593,921],[1592,951],[1633,941],[1632,809],[1595,809],[1600,818],[1584,865],[1579,809],[1459,807]]},"14":{"n":14,"x":1295,"y":813,"acres":6.0,"street":"Wild Turkey Road","status":"available","price":250000,"perks":["Gentle, buildable homesite","Paved road frontage"],"poly":[[1497,796],[1485,745],[1407,742],[1482,728],[1378,735],[1404,735],[1405,750],[1164,750],[1252,916],[1298,897],[1340,912],[1340,876],[1351,900],[1373,859],[1382,866],[1449,799]]},"15":{"n":15,"x":1088,"y":770,"acres":3.6,"street":"Wild Turkey Road","status":"available","price":197000,"perks":["Granite outcroppings","Gentle, buildable homesite"],"poly":[[1088,621],[1047,686],[1034,761],[1021,762],[1002,797],[1014,803],[1014,784],[1028,784],[1027,820],[1164,935],[1196,903],[1213,935],[1241,921]]},"16":{"n":16,"x":1015,"y":920,"acres":7.3,"street":"Wild Turkey Road","status":"sold","price":null,"perks":["Estate-size acreage","Private, end-of-road setting"],"poly":[[996,806],[899,896],[983,852],[984,863],[912,911],[957,949],[1071,1088],[1084,1049],[1107,1026],[1084,1025],[1096,1012],[1081,1007],[1079,986],[1119,981],[1142,935],[1111,919],[1112,907],[1029,835],[1004,842],[1010,820]]},"17":{"n":17,"x":865,"y":1013,"acres":4.9,"street":"Wild Turkey Road","status":"available","price":226000,"perks":["Gentle, buildable homesite","Paved road frontage"],"poly":[[886,904],[860,939],[795,991],[789,1009],[752,1034],[759,1061],[751,1073],[767,1076],[767,1102],[815,1097],[817,1086],[829,1093],[874,1090],[891,1097],[890,1035],[850,1045],[848,1035],[830,1028],[827,989],[842,970],[857,964],[890,970]]},"18":{"n":18,"x":793,"y":895,"acres":8.6,"street":"Wild Turkey Road","status":"available","price":307000,"perks":["Estate-size acreage","Granite outcroppings"],"poly":[[678,763],[603,887],[637,891],[642,902],[626,905],[685,939],[683,929],[692,927],[718,974],[735,982],[750,974],[755,981],[786,944],[793,947],[867,891]]},"19":{"n":19,"x":568,"y":760,"acres":6.2,"street":"Pheasant Tail Trace","status":"under","price":null,"perks":["Creek frontage / seasonal branch","Gentle, buildable homesite"],"poly":[[471,636],[436,686],[430,716],[453,776],[459,820],[468,828],[463,835],[504,881],[527,888],[561,878],[584,886],[584,863],[591,863],[594,879],[668,756],[595,709],[586,712],[581,699],[481,636],[474,644]]},"20":{"n":20,"x":655,"y":685,"acres":3.8,"street":"Pheasant Tail Trace","status":"available","price":237000,"perks":["Creek frontage / seasonal branch","Private, end-of-road setting"],"poly":[[609,346],[591,385],[601,386],[601,408],[588,391],[589,404],[555,437],[480,622],[715,772],[691,636],[625,636],[635,626],[605,562],[596,466]]},"21":{"n":21,"x":795,"y":697,"acres":7.5,"street":"Wild Turkey Road","status":"available","price":283000,"perks":["Estate-size acreage","Granite outcroppings"],"poly":[[806,562],[702,633],[726,779],[872,873],[889,869],[888,827],[898,820],[897,860],[913,865],[943,843],[939,834],[951,823],[898,727],[899,750],[888,752],[888,708]]},"22":{"n":22,"x":962,"y":653,"acres":5.1,"street":"Stone Fly Close","status":"available","price":265000,"perks":["Creek frontage / seasonal branch","Gentle, buildable homesite"],"poly":[[1149,502],[1081,516],[1004,574],[951,594],[982,597],[1001,614],[1003,639],[984,661],[939,661],[922,627],[946,595],[895,587],[899,711],[954,807],[969,794],[964,825],[991,793],[981,767],[999,780],[1043,666],[1135,540]]},"23":{"n":23,"x":1285,"y":665,"acres":8.8,"street":"Stone Fly Close","status":"under","price":null,"perks":["Long-range ridgeline views","Estate-size acreage"],"poly":[[1094,611],[1156,736],[1480,725],[1454,615],[1383,622],[1273,604],[1232,580],[1192,519],[1166,503]]},"24":{"n":24,"x":1545,"y":645,"acres":6.4,"street":"Stone Fly Close","status":"coming","price":null,"perks":["Long-range ridgeline views","Borders the national forest","Granite outcroppings"],"poly":[[1466,614],[1507,798],[1585,798],[1579,785],[1585,684],[1573,628],[1543,611],[1520,633],[1522,653],[1532,663],[1563,670],[1561,677],[1544,678],[1524,671],[1510,650],[1514,622],[1531,611],[1507,612],[1506,620],[1493,622],[1487,614]]},"25":{"n":25,"x":1445,"y":285,"acres":4.0,"street":"Stone Fly Close","status":"available","price":266000,"perks":["Long-range ridgeline views","Borders the national forest"],"poly":[[1388,248],[1512,232],[1556,300],[1545,352],[1430,350]]},"26":{"n":26,"x":905,"y":98,"acres":7.7,"street":"Stone Fly Close","status":"available","price":347000,"perks":["Long-range ridgeline views","Borders the national forest","Estate-size acreage"],"poly":[[1130,130],[1058,72],[1030,32],[850,33],[813,41],[735,151],[880,156],[869,84],[907,63],[940,78],[947,106],[924,132],[892,131],[893,157],[1105,162]]},"27":{"n":27,"x":980,"y":240,"acres":5.3,"street":"Stone Fly Close","status":"available","price":235000,"perks":["Granite outcroppings","Gentle, buildable homesite"],"poly":[[896,359],[1210,237],[1116,227],[1107,218],[1111,183],[1102,172],[891,167]]},"28":{"n":28,"x":1175,"y":333,"acres":9.0,"street":"Stone Fly Close","status":"sold","price":null,"perks":["Estate-size acreage","Private, end-of-road setting"],"poly":[[1311,321],[1250,226],[1195,200],[1138,204],[1119,192],[1128,219],[1198,217],[1229,232],[1233,247],[886,374],[1236,404]]},"29":{"n":29,"x":1358,"y":423,"acres":6.6,"street":"Stone Fly Close","status":"available","price":323000,"perks":["Long-range ridgeline views","Gentle, buildable homesite"],"poly":[[1213,495],[1226,493],[1226,486],[1233,479],[1258,477],[1264,485],[1356,468],[1332,467],[1325,462],[1267,460],[1264,456],[1230,455],[1217,473],[1225,481],[1225,486],[1210,488]]},"30":{"n":30,"x":1375,"y":512,"acres":4.2,"street":"Stone Fly Close","status":"available","price":270000,"perks":["Long-range ridgeline views","Granite outcroppings"],"poly":[[1580,454],[1266,488],[1275,506],[1252,513],[1273,513],[1301,551],[1288,570],[1217,498],[1256,559],[1302,582],[1541,583],[1531,596],[1315,597],[1225,546],[1295,600],[1563,592],[1577,617]]},"31":{"n":31,"x":1018,"y":437,"acres":7.9,"street":"Stone Fly Close","status":"under","price":null,"perks":["Creek frontage / seasonal branch","Estate-size acreage"],"poly":[[870,384],[886,523],[894,405],[896,529],[914,534],[948,516],[955,528],[982,514],[986,547],[1069,487],[1171,471],[1142,455],[1165,452],[1189,478],[1202,451],[1186,430],[1210,438],[1228,419],[895,384],[887,403],[885,384]]},"32":{"n":32,"x":808,"y":348,"acres":5.5,"street":"Stone Fly Close","status":"available","price":239000,"perks":["Private, end-of-road setting","Gentle, buildable homesite"],"poly":[[766,164],[753,496],[717,531],[746,543],[764,532],[779,540],[830,528],[879,547],[877,532],[867,530],[875,511],[860,382],[867,167]]},"33":{"n":33,"x":693,"y":353,"acres":3.1,"street":"Stone Fly Close","status":"coming","price":null,"perks":["Creek frontage / seasonal branch","Granite outcroppings"],"poly":[[753,163],[723,187],[727,162],[618,294],[642,314],[654,380],[641,369],[645,516],[663,506],[644,503],[642,478],[653,492],[672,479],[683,518],[662,521],[678,528],[688,606],[657,587],[631,507],[647,589],[670,609],[768,553],[703,540],[743,489]]},"34":{"n":34,"x":635,"y":148,"acres":6.8,"street":"Stone Fly Close","status":"available","price":328000,"perks":["Long-range ridgeline views","Gentle, buildable homesite"],"poly":[[805,35],[614,36],[621,48],[608,50],[539,230],[565,266],[590,286],[609,290],[723,151]]},"35":{"n":35,"x":455,"y":115,"acres":4.4,"street":"Stone Fly Close","status":"sold","price":null,"perks":["Long-range ridgeline views","Gentle, buildable homesite"],"poly":[[319,39],[339,170],[373,188],[410,188],[423,202],[426,222],[457,230],[530,226],[603,36]]},"36":{"n":36,"x":180,"y":123,"acres":8.1,"street":"Stone Fly Close","status":"available","price":356000,"perks":["Long-range ridgeline views","Borders the national forest","Estate-size acreage"],"poly":[[364,195],[330,180],[310,48],[298,45],[306,38],[150,39],[117,48],[100,41],[100,198],[320,211],[298,204],[308,197],[338,203],[336,212],[323,212],[358,213]]},"37":{"n":37,"x":198,"y":283,"acres":5.7,"street":"Stone Fly Close","status":"available","price":303000,"perks":["Long-range ridgeline views","Borders the national forest"],"poly":[[386,244],[360,223],[98,208],[92,511]]},"38":{"n":38,"x":348,"y":365,"acres":3.3,"street":"Stone Fly Close","status":"available","price":226000,"perks":["Creek frontage / seasonal branch","Gentle, buildable homesite"],"poly":[[496,256],[443,262],[397,249],[95,526],[303,550],[290,536],[316,530]]},"39":{"n":39,"x":458,"y":403,"acres":7.0,"street":"Stone Fly Close","status":"available","price":307000,"perks":["Creek frontage / seasonal branch","Estate-size acreage","Granite outcroppings"],"poly":[[523,259],[513,254],[314,551],[471,567],[520,431],[574,350],[577,324],[523,269]]},"40":{"n":40,"x":253,"y":595,"acres":4.6,"street":"Pheasant Tail Trace","status":"under","price":null,"perks":["Creek frontage / seasonal branch","Private, end-of-road setting"],"poly":[[89,534],[94,624],[134,627],[125,594],[138,567],[152,590],[147,630],[382,658],[401,649],[398,660],[413,661],[456,600],[436,609],[456,577],[110,539],[120,557],[110,564]]},"41":{"n":41,"x":210,"y":708,"acres":8.3,"street":"Pheasant Tail Trace","status":"available","price":301000,"perks":["Estate-size acreage","Gentle, buildable homesite"],"poly":[[84,773],[365,752],[384,725],[376,718],[376,691],[385,690],[392,722],[406,673],[89,633]]},"42":{"n":42,"x":178,"y":823,"acres":5.9,"street":"Pheasant Tail Trace","status":"available","price":248000,"perks":["Borders the national forest","Granite outcroppings"],"poly":[[407,760],[381,751],[368,766],[249,774],[249,782],[83,782],[77,919],[376,833],[381,805],[366,800],[378,793],[357,787],[351,770],[387,764],[408,816],[422,812]]},"43":{"n":43,"x":285,"y":930,"acres":3.5,"street":"Pheasant Tail Trace","status":"available","price":195000,"perks":["Gentle, buildable homesite","Paved road frontage"],"poly":[[436,911],[420,906],[420,879],[409,881],[390,839],[290,875],[322,941],[287,976],[241,944],[243,908],[272,895],[267,882],[77,937],[76,965],[259,1035],[280,1030],[295,1047],[302,1018],[322,1022],[313,1009],[324,977],[343,991],[331,1014],[410,936],[407,924]]},"44":{"n":44,"x":480,"y":990,"acres":7.2,"street":"Pheasant Tail Trace","status":"sold","price":null,"perks":["Estate-size acreage","Private, end-of-road setting"],"poly":[[622,998],[592,981],[594,1010],[585,1012],[584,972],[572,962],[584,953],[578,919],[507,920],[470,898],[464,912],[482,914],[482,929],[449,943],[447,927],[438,926],[378,984],[378,995],[369,992],[307,1056],[322,1070],[494,1072]]},"45":{"n":45,"x":628,"y":1183,"acres":4.8,"street":"Pheasant Tail Trace","status":"available","price":224000,"perks":["Granite outcroppings","Gentle, buildable homesite"],"poly":[[657,965],[666,991],[625,1017],[587,1175],[595,1186],[609,1153],[640,1144],[677,1164],[677,1189],[653,1220],[618,1224],[598,1199],[586,1220],[585,1181],[563,1294],[588,1324],[595,1308],[598,1330],[635,1317],[708,1170],[680,1167],[673,1084],[686,1076],[670,1073],[674,1055],[709,1060],[710,1163],[719,1050]]},"46":{"n":46,"x":478,"y":1157,"acres":8.5,"street":"Pheasant Tail Trace","status":"available","price":305000,"perks":["Estate-size acreage","Gentle, buildable homesite"],"poly":[[365,1109],[370,1138],[431,1255],[458,1242],[491,1239],[527,1251],[550,1276],[600,1076],[592,1077],[587,1092],[585,1076],[490,1075],[490,1086],[470,1098],[441,1105],[424,1098],[419,1107],[387,1117]]},"47":{"n":47,"x":292,"y":1243,"acres":6.1,"street":"Pheasant Tail Trace","status":"available","price":287000,"perks":["Creek frontage / seasonal branch","Gentle, buildable homesite"],"poly":[[347,1115],[295,1148],[244,1156],[184,1200],[178,1221],[158,1236],[252,1293],[268,1312],[211,1285],[227,1308],[334,1321],[377,1305],[419,1269]]},"48":{"n":48,"x":148,"y":1093,"acres":3.7,"street":"Pheasant Tail Trace","status":"available","price":234000,"perks":["Creek frontage / seasonal branch","Borders the national forest","Granite outcroppings"],"poly":[[76,979],[68,1184],[90,1200],[101,1196],[151,1225],[169,1213],[176,1192],[234,1148],[276,1131],[288,1134],[337,1104],[295,1062],[287,1061],[288,1073],[278,1063],[274,1074],[260,1073],[257,1047]]}};
+const PHOTOS = {"8":["media/lots/lot-8.jpg","media/lots/lot-8-2.jpg"]};
+const STATUS={available:{label:"Available"},under:{label:"Under Contract"},sold:{label:"Sold"},coming:{label:"Coming Soon"}};
+const SVGNS='http://www.w3.org/2000/svg';
+const shapes=document.getElementById('shapes'),labels=document.getElementById('labels'),bursts=document.getElementById('bursts');
+const active=new Set(['available','under','sold','coming']);
+let selected=null;
+const money=n=>n==null?null:'$'+n.toLocaleString('en-US');
+const centroid=p=>{let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1];});return[x/p.length,y/p.length];};
+const acTxt=a=>(a%1===0?a.toFixed(1):a)+' Acres';
+
+function camBadge(cx,cy){var x=cx-12,y=cy-12;return '<g class="cam"><circle cx="'+x+'" cy="'+y+'" r="7"></circle>'+'<rect x="'+(x-3.4)+'" y="'+(y-1.6)+'" width="6.8" height="5" rx="1" fill="none" stroke="#fff" stroke-width="1"></rect>'+'<rect x="'+(x-1.2)+'" y="'+(y-3)+'" width="2.4" height="1.6" fill="#fff" stroke="none"></rect>'+'<circle cx="'+x+'" cy="'+(y+0.9)+'" r="1.5" fill="#fff" stroke="none"></circle></g>';}
+function galleryHTML(n){var ph=PHOTOS[String(n)];if(!ph||!ph.length)return "";var thumbs="";if(ph.length>1){thumbs='<div class="thumbs">'+ph.map(function(p,i){return '<img src="'+p+'" class="'+(i===0?"on":"")+'" onclick="swapMain(this,\''+p+'\')" alt="">';}).join("")+'</div>';}return '<div class="d-photos"><img class="main" id="dmain" src="'+ph[0]+'" alt="Lot '+n+' photo">'+thumbs+'</div>';}
+function swapMain(el,src){var m=document.getElementById("dmain");if(m)m.src=src;document.querySelectorAll(".d-photos .thumbs img").forEach(function(t){t.classList.remove("on");});el.classList.add("on");}
+function starPoints(cx,cy,r1,r2,n){let s='';for(let i=0;i<n*2;i++){const a=Math.PI*i/n-Math.PI/2;const r=i%2?r2:r1;s+=(cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1)+' ';}return s.trim();}
+
+Object.values(LOTS).forEach(lot=>{
+  if(!lot.poly||lot.poly.length<3) return;
+  const poly=document.createElementNS(SVGNS,'polygon');
+  poly.setAttribute('points',lot.poly.map(p=>p.join(',')).join(' '));
+  poly.setAttribute('class','lot s-'+lot.status);
+  poly.dataset.n=lot.n; poly.dataset.st=lot.status;
+  shapes.appendChild(poly);
+
+  const [cx,cy]=centroid(lot.poly);
+  const g=document.createElementNS(SVGNS,'g');
+  g.setAttribute('class','label st-'+lot.status); g.dataset.n=lot.n; g.dataset.st=lot.status;
+  g.innerHTML='<circle cx="'+cx+'" cy="'+cy+'" r="24" fill="#fff" fill-opacity=".82" stroke="none"></circle>'+'<rect x="'+(cx-34)+'" y="'+(cy+18)+'" width="68" height="20" fill="#fff" fill-opacity=".78" stroke="none"></rect>'+'<circle cx="'+cx+'" cy="'+cy+'" r="16"></circle>'+
+    '<circle class="dotstatus" cx="'+(cx+12)+'" cy="'+(cy-12)+'" r="4.5"></circle>'+
+    '<text class="num" x="'+cx+'" y="'+cy+'">'+lot.n+'</text>'+
+    '<text class="ac" x="'+cx+'" y="'+(cy+28)+'">'+acTxt(lot.acres)+'</text>'+(PHOTOS[String(lot.n)]?camBadge(cx,cy):'');
+  labels.appendChild(g);
+
+  if(lot.status==='sold'){
+    const b=document.createElementNS(SVGNS,'g');
+    b.setAttribute('class','burst'); b.dataset.n=lot.n; b.dataset.st='sold';
+    const bx=cx, by=cy-40;
+    b.innerHTML='<polygon points="'+starPoints(bx,by,22,15,12)+'"></polygon><text x="'+bx+'" y="'+by+'">SOLD</text>';
+    bursts.appendChild(b);
+  }
+
+  [poly,g].forEach(el=>{
+    el.addEventListener('click',e=>{e.stopPropagation();openLot(lot.n);});
+    el.addEventListener('mouseenter',e=>showTip(e,lot));
+    el.addEventListener('mousemove',moveTip); el.addEventListener('mouseleave',hideTip);
+  });
+});
+
+function refreshCounts(){const c={available:0,under:0,sold:0,coming:0};Object.values(LOTS).forEach(l=>c[l.status]++);for(const k in c)document.getElementById('ct-'+k).textContent=c[k];}
+refreshCounts();
+function applyFilter(){document.querySelectorAll('.lot,.label,.burst').forEach(el=>el.classList.toggle('dimmed',!active.has(el.dataset.st)));}
+document.querySelectorAll('.lrow').forEach(r=>r.addEventListener('click',()=>{const st=r.dataset.st,on=r.getAttribute('aria-pressed')==='true';r.setAttribute('aria-pressed',(!on).toString());if(on)active.delete(st);else active.add(st);applyFilter();}));
+
+const tip=document.createElement('div');tip.className='tip';document.body.appendChild(tip);
+function showTip(e,lot){tip.innerHTML='<b>Lot '+lot.n+'</b> · '+acTxt(lot.acres)+' · '+STATUS[lot.status].label;tip.classList.add('show');moveTip(e);}
+function moveTip(e){tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px';}
+function hideTip(){tip.classList.remove('show');}
+
+const scrim=document.getElementById('scrim'),drawer=document.getElementById('drawer'),dbody=document.getElementById('dbody');
+function openLot(n){
+  const lot=LOTS[String(n)];if(!lot)return;hideTip();
+  document.querySelectorAll('.lot.selected').forEach(e=>e.classList.remove('selected'));
+  selected=document.querySelector('.lot[data-n="'+n+'"]');if(selected)selected.classList.add('selected');
+  const st=lot.status,S=STATUS[st];
+  const priceRow=st==='available'?'<div class="d-fact"><div class="k">Price</div><div class="v">'+(money(lot.price)||'Inquire')+'</div></div>':'<div class="d-fact"><div class="k">Price</div><div class="v">&mdash;</div></div>';
+  const perks=lot.perks.map(p=>'<li>'+p+'</li>').join('');
+  const cta=(st==='available'||st==='coming')?'<a class="btn" href="index.html#inquire">Inquire About Lot '+n+'</a>':'<a class="btn ghost" href="#" onclick="document.querySelectorAll(\'.lrow\').forEach(r=>{});closeDrawer();return false;">See Available Lots</a>';
+  dbody.innerHTML=galleryHTML(n)+'<span class="d-eyebrow">'+lot.street+'</span><div class="d-lotno">Lot '+n+'</div>'+
+    '<span class="status-pill sp-'+st+'"><span class="dot"></span>'+S.label+'</span>'+
+    '<div class="d-facts"><div class="d-fact"><div class="k">Acreage</div><div class="v">'+acTxt(lot.acres)+'</div></div>'+priceRow+
+    '<div class="d-fact"><div class="k">Access</div><div class="v" style="font-size:.98rem">'+lot.street+'</div></div>'+
+    '<div class="d-fact"><div class="k">Status</div><div class="v" style="font-size:.98rem">'+S.label+'</div></div></div>'+
+    '<ul class="d-perks">'+perks+'</ul>'+cta+'<p class="d-note">Reference Lot '+n+' when you reach out.</p>';
+  scrim.classList.add('open');drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');
+}
+function closeDrawer(){scrim.classList.remove('open');drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');if(selected){selected.classList.remove('selected');selected=null;}}
+document.getElementById('dclose').addEventListener('click',closeDrawer);
+scrim.addEventListener('click',closeDrawer);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+
+const search=document.getElementById('search');
+function doSearch(){const n=parseInt(search.value,10);if(LOTS[String(n)])openLot(n);}
+search.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+search.addEventListener('input',()=>{if(search.value.length>=2&&LOTS[String(parseInt(search.value,10))])doSearch();});
+
+const legend=document.getElementById('legend'),legendBtn=document.getElementById('legendBtn');
+legendBtn.addEventListener('click',()=>{const vis=legend.style.display!=='none';legend.style.display=vis?'none':'block';legendBtn.classList.toggle('on',!vis);legendBtn.setAttribute('aria-pressed',(!vis).toString());});
+const stage=document.querySelector('.stage'),fsBtn=document.getElementById('fsBtn');
+fsBtn.addEventListener('click',()=>{if(!document.fullscreenElement){(document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen());}else{document.exitFullscreen();}});
+
+const scroll=document.getElementById('scroll'),inner=document.getElementById('inner');
+let zoom=1;const MIN=1,MAX=5;
+function applyZoom(center){const pW=inner.offsetWidth,pL=scroll.scrollLeft,pT=scroll.scrollTop,cx=pL+scroll.clientWidth/2,cy=pT+scroll.clientHeight/2;inner.style.width=(zoom*100)+'%';if(center)requestAnimationFrame(()=>{const r=inner.offsetWidth/pW;scroll.scrollLeft=cx*r-scroll.clientWidth/2;scroll.scrollTop=cy*r-scroll.clientHeight/2;});}
+function fit(){zoom=window.innerWidth<820?1.8:1;applyZoom(false);}
+document.getElementById('zin').onclick=()=>{zoom=Math.min(MAX,+(zoom+0.5).toFixed(2));applyZoom(true);};
+document.getElementById('zout').onclick=()=>{zoom=Math.max(MIN,+(zoom-0.5).toFixed(2));applyZoom(true);};
+document.getElementById('zrst').onclick=()=>{fit();scroll.scrollTo({left:0,top:0});};
+fit();
+let dragging=false,sx,sy,sl,st2;
+scroll.addEventListener('pointerdown',e=>{if(e.target.closest('.lot')||e.target.closest('.label')||e.target.closest('.burst'))return;dragging=true;sx=e.clientX;sy=e.clientY;sl=scroll.scrollLeft;st2=scroll.scrollTop;scroll.classList.add('panning');scroll.setPointerCapture(e.pointerId);});
+scroll.addEventListener('pointermove',e=>{if(!dragging)return;scroll.scrollLeft=sl-(e.clientX-sx);scroll.scrollTop=st2-(e.clientY-sy);});
+function endDrag(){dragging=false;scroll.classList.remove('panning');}
+scroll.addEventListener('pointerup',endDrag);scroll.addEventListener('pointercancel',endDrag);
+scroll.addEventListener('wheel',e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();zoom=Math.min(MAX,Math.max(MIN,+(zoom-(e.deltaY>0?0.3:-0.3)).toFixed(2)));applyZoom(true);},{passive:false});
+</script>
+</body>
+</html>
