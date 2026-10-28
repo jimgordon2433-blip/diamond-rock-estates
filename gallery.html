@@ -169,5 +169,25 @@ document.addEventListener('keydown',e=>{if(!lb.classList.contains('open'))return
 let tx=0;lb.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
 lb.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?next():prev();}},{passive:true});
 </script>
+<audio id="bgm" loop preload="none"><source src="media/ambient-nature.mp3" type="audio/mpeg"></audio>
+<button id="sndBtn" class="snd-toggle" aria-label="Play ambient sound" title="Ambient sound">
+  <svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+  <svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 5.5a9 9 0 0 1 0 13"/></svg>
+</button>
+<style>
+.snd-toggle{position:fixed;right:20px;bottom:20px;z-index:60;width:46px;height:46px;border-radius:50%;border:1px solid rgba(201,168,76,.5);background:rgba(15,14,11,.72);backdrop-filter:blur(6px);color:#c9a84c;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .3s,border-color .3s,color .3s;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.snd-toggle:hover{background:rgba(15,14,11,.92);border-color:#c9a84c;}
+.snd-toggle.playing{background:#c9a84c;color:#0f0e0b;border-color:#c9a84c;}
+.snd-toggle svg{width:20px;height:20px;}
+</style>
+<script>
+(function(){var a=document.getElementById('bgm'),b=document.getElementById('sndBtn');if(!a||!b)return;a.volume=0.55;
+var on=false;try{on=localStorage.getItem('dre-sound')==='on';}catch(e){}
+function icon(){b.classList.toggle('playing',on);b.querySelector('.snd-on').style.display=on?'block':'none';b.querySelector('.snd-off').style.display=on?'none':'block';b.setAttribute('aria-label',on?'Mute ambient sound':'Play ambient sound');}
+function play(){var p=a.play();if(p&&p.catch)p.catch(function(){});}
+b.addEventListener('click',function(){on=!on;try{localStorage.setItem('dre-sound',on?'on':'off');}catch(e){}if(on)play();else a.pause();icon();});
+if(on){play();var r=function(){if(on)play();document.removeEventListener('pointerdown',r);};document.addEventListener('pointerdown',r,{once:true});}
+icon();})();
+</script>
 </body>
 </html>
