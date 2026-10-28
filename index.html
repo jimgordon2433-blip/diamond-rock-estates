@@ -912,10 +912,8 @@
   // Pre-fill inquiry when arriving from a specific lot (set on the Lots page)
   (function(){try{var lot=sessionStorage.getItem('lot');if(lot){var m=document.getElementById('message');if(m&&!m.value){m.value="I'm interested in Lot "+lot+".";var lbl=m.nextElementSibling;}sessionStorage.removeItem('lot');if(location.hash==='#inquire'){var el=document.getElementById('inquire');if(el)setTimeout(function(){el.scrollIntoView();},200);}}}catch(e){}})();
 </script>
-<audio id="amb-forest" loop preload="none"><source src="media/amb-forest.mp3" type="audio/mpeg"></audio>
-<audio id="amb-creek" loop preload="none"><source src="media/amb-creek.mp3" type="audio/mpeg"></audio>
-<audio id="amb-wind" loop preload="none"><source src="media/amb-wind.mp3" type="audio/mpeg"></audio>
-<button id="sndBtn" class="snd-toggle" aria-label="Play ambient sound" title="Ambient sound">
+<audio id="bgm" loop preload="none"><source src="media/amb-forest.mp3" type="audio/mpeg"></audio>
+<button id="sndBtn" class="snd-toggle" aria-label="Play ambient birdsong" title="Ambient birdsong">
   <svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
   <svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 5.5a9 9 0 0 1 0 13"/></svg>
 </button>
@@ -926,40 +924,13 @@
 .snd-toggle svg{width:20px;height:20px;}
 </style>
 <script>
-(function(){
- var btn=document.getElementById('sndBtn');
- var stems={forest:document.getElementById('amb-forest'),creek:document.getElementById('amb-creek'),wind:document.getElementById('amb-wind')};
- var MASTER=0.6;
- var fb=document.getElementsByClassName('filmband');
- var map=[
-   {el:document.querySelector('header.hero'),mix:{forest:.7,creek:0,wind:.3}},
-   {el:document.getElementById('story'),mix:{forest:.85,creek:.05,wind:.1}},
-   {el:document.getElementById('build'),mix:{forest:.8,creek:0,wind:.15}},
-   {el:fb[0],mix:{forest:.3,creek:0,wind:.85}},
-   {el:document.getElementById('land'),mix:{forest:.6,creek:0,wind:.35}},
-   {el:fb[1],mix:{forest:.25,creek:.9,wind:.1}},
-   {el:document.getElementById('location'),mix:{forest:.75,creek:.1,wind:.2}},
-   {el:document.querySelector('.gallery'),mix:{forest:.75,creek:.1,wind:.2}},
-   {el:document.getElementById('inquire'),mix:{forest:.65,creek:0,wind:.2}}
- ].filter(function(x){return x.el;});
- var cur={forest:0,creek:0,wind:0},target={forest:.7,creek:0,wind:.3};
- function computeTarget(){
-   var vh=window.innerHeight,tot=0,acc={forest:0,creek:0,wind:0};
-   map.forEach(function(s){var r=s.el.getBoundingClientRect();
-     var vis=Math.max(0,Math.min(r.bottom,vh)-Math.max(r.top,0));var w=vis/vh;if(w<=0)return;
-     tot+=w;for(var k in acc)acc[k]+=w*(s.mix[k]||0);});
-   if(tot>0){for(var k in acc)target[k]=acc[k]/tot;}
- }
- var on=false;try{on=localStorage.getItem('dre-sound')==='on';}catch(e){}
- function playAll(){for(var k in stems){stems[k].volume=Math.max(0,Math.min(1,cur[k]*MASTER));var p=stems[k].play();if(p&&p.catch)p.catch(function(){});}}
- function pauseAll(){for(var k in stems)stems[k].pause();}
- function icon(){btn.classList.toggle('playing',on);btn.querySelector('.snd-on').style.display=on?'block':'none';btn.querySelector('.snd-off').style.display=on?'none':'block';btn.setAttribute('aria-label',on?'Mute ambient sound':'Play ambient sound');}
- function loop(){computeTarget();for(var k in cur){cur[k]+=(target[k]-cur[k])*0.05;if(on)stems[k].volume=Math.max(0,Math.min(1,cur[k]*MASTER));}requestAnimationFrame(loop);}
- btn.addEventListener('click',function(){on=!on;try{localStorage.setItem('dre-sound',on?'on':'off');}catch(e){}if(on)playAll();else pauseAll();icon();});
- computeTarget();cur.forest=target.forest;cur.creek=target.creek;cur.wind=target.wind;
- if(on){playAll();var r=function(){if(on)playAll();document.removeEventListener('pointerdown',r);};document.addEventListener('pointerdown',r,{once:true});}
- icon();loop();
-})();
+(function(){var a=document.getElementById('bgm'),b=document.getElementById('sndBtn');if(!a||!b)return;a.volume=0.5;
+var on=false;try{on=localStorage.getItem('dre-sound')==='on';}catch(e){}
+function icon(){b.classList.toggle('playing',on);b.querySelector('.snd-on').style.display=on?'block':'none';b.querySelector('.snd-off').style.display=on?'none':'block';b.setAttribute('aria-label',on?'Mute ambient birdsong':'Play ambient birdsong');}
+function play(){var p=a.play();if(p&&p.catch)p.catch(function(){});}
+b.addEventListener('click',function(){on=!on;try{localStorage.setItem('dre-sound',on?'on':'off');}catch(e){}if(on)play();else a.pause();icon();});
+if(on){play();var r=function(){if(on)play();document.removeEventListener('pointerdown',r);};document.addEventListener('pointerdown',r,{once:true});}
+icon();})();
 </script>
 </body>
 </html>
